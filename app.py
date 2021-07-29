@@ -1,10 +1,13 @@
-from flask import Flask, render_template, redirect, session, flash
+import os
+from threading import ThreadError
+from flask import Flask, render_template, redirect, session, flash, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
-from forms import RegisterForm
+from forms import RegisterForm, LoginForm
 
-
+#sets up session variable
+CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
@@ -34,6 +37,28 @@ def home_page():
 #                   Register, Login, and Logout Routes
 #--------------------------------------------------------------------------#
 
+@app.before_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
+
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+
+    else:
+        g.user = None
+
+
+def do_login(user):
+    """Log in user."""
+    session[CURR_USER_KEY] = user.user_id
+
+
+def do_logout():
+    """Logout user."""
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
+        
+
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
     """Register User: Validate submissions, create a new user, add user to session """
@@ -62,8 +87,34 @@ def register_user():
         except IntegrityError:
             form.username.errors.append('Sorry, but this username is taken.  Please pick another')
             return render_template('register.html', form=form)
-        session['username'] = new_user.username
+        do_login(new_user)
         flash('Welcome! Your Account has been created!', "success")
         return redirect('/')
 
     return render_template('register.html', form=form)
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    """Handle user login."""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data,
+                                 form.password.data)
+
+        if user:
+            do_login(user)
+            flash(f"Hello, {user.username}!", "success")
+            return redirect("/")
+
+        flash("Invalid credentials.", 'danger')
+
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+def logout():
+    """Logout user by removing their username from the session"""
+    do_logout()
+    flash("You have been logged out.", 'danger')
+    return redirect('/login')

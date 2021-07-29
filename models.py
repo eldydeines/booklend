@@ -42,3 +42,19 @@ class User(db.Model):
         return cls(username=username, password=hashed_utf8, email=email, first_name=first_name, last_name=last_name,
                    address1=address1, address2=address2, town=town, state=state, zip=zip, phone=phone, profile=profile, 
                    fav_book=fav_book, fav_author=fav_author)
+
+    @classmethod
+    def authenticate(cls, username, password):
+        """Searches for a user by decrypting the hash.
+        If match, send back authenticated user.
+        If no match, it returns False.
+        """
+        
+        user = cls.query.filter_by(username=username).first()
+
+        if user:
+            is_auth = bcrypt.check_password_hash(user.password, password)
+            if is_auth:
+                return user
+
+        return False
