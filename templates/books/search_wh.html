@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-12">
+    <h1 class="text-center" align="center">Getting Started!</h1>
+
+    <h4 align="center">Booklend is all about sharing your library.</h4>
+    <h4 align="center">Let's start adding books!</h4>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="form-group col-6" align="center">
+
+            <form id="find-book-form">
+                <div class="m-2">Title of Book: <input id="title"></div>
+                <div class="m-2">Author of Book: <input id="author"></div>
+                <button class="btn btn-success m-2">Find my book</button>
+            </form>
+            <div id="search-results"></div>
+        </div>
+        <div class="col-3"></div>
+    </div>
+</div>
+{% endblock %}

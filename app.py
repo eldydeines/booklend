@@ -1,20 +1,21 @@
 import os
 from threading import ThreadError
-from flask import Flask, render_template, redirect, session, flash, g
+from flask import Flask, render_template, request, redirect, session, flash, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
 from forms import RegisterForm, LoginForm
+from func import Warehouse
 
 #sets up session variable
-CURR_USER_KEY = "curr_user"
+CURR_USER_KEY = ""
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
 #app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
-app.config["SECRET_KEY"] = "abc123"
+app.config["SECRET_KEY"] = "CKsec123secKC"
 #app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'ed2407')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
@@ -118,3 +119,24 @@ def logout():
     do_logout()
     flash("You have been logged out.", 'danger')
     return redirect('/login')
+
+#--------------------------------------------------------------------------#
+#                   Book Routes
+#--------------------------------------------------------------------------#
+
+@app.route("/findbooks")
+def find_books():
+    """Render search form"""
+    return render_template('books/search_wh.html')
+
+@app.route('/api/search-wh')
+def search_wh():
+    """ This will get books based on Title and Author"""
+    title = request.args['title']
+    author = request.args['author']
+    
+    book_criteria = Warehouse(title, author)
+    print('******************************')
+    print(book_criteria)
+    found_books = book_criteria.findBooksInWH()
+    return render_template('books/search_wh.html')
