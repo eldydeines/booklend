@@ -136,7 +136,17 @@ def search_wh():
     author = request.args['author']
     
     book_criteria = Warehouse(title, author)
-    print('******************************')
-    print(book_criteria)
+
     found_books = book_criteria.findBooksInWH()
+
+    if found_books:
+        message = "Here are your results!"
+        results = True
+    else: 
+        message = "Sorry search turned up empty"
+    
+    if results: 
+        print("***********!!!!!!!!!!!!!!!!!!")
+        print(found_books)
+        print(message)
     return render_template('books/search_wh.html')
