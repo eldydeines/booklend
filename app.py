@@ -3,7 +3,7 @@ from threading import ThreadError
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import db, connect_db, User
+from models import db, connect_db, User, Book, Status
 from forms import RegisterForm, LoginForm
 from func import Warehouse
 

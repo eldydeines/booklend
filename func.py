@@ -63,7 +63,7 @@ class Warehouse:
             edition_key = self.findings['docs'][doc]['edition_key'][0]
             cover_id = book_info.get('cover_edition_key', edition_key)
             self.findings['docs'][doc]['cover_img_url'] = COVER_URL + cover_id + "-M.jpg"
-       
+
             
             #serialize findings
             book = {
@@ -78,5 +78,7 @@ class Warehouse:
 
             #append dictionary
             books_found[doc] = book
+
+        self.findings = books_found
 
         return books_found
