@@ -13,14 +13,14 @@
 <body>
     <nav class="navbar navbar-light bg-primary justify-content-between ">
         <div class="container">
-            <a href="/" class="navbar-brand text-light">BookLend</a>
+            <a href="/" class="navbar-brand text-light">BookLandia</a>
             <ul class="nav navbar-nav flex-row float-right">
                 {% if not g.user %}
-                <li class="m-r-2"><a href="/register">Sign up</a></li>
-                <li class="m-r-2"><a href="/login">Log in</a></li>
+                <li class="mr-2"><a href="/register">Sign up</a></li>
+                <li class="mr-2"><a href="/login">Log in</a></li>
                 {% else %}
-                <li class="m-r-2"><a href="/findbooks">Find Books to Add</a></li>
-                <li class="m-r-2"><a href="/logout">Log out</a></li>
+                <li class="mr-2"><a href="/findbooks">Find Books to Add</a></li>
+                <li class="mr-2"><a href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
         </div>

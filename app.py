@@ -1,6 +1,6 @@
 import os
 from threading import ThreadError
-from flask import Flask, render_template, request, redirect, session, flash, g
+from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User
@@ -141,12 +141,9 @@ def search_wh():
 
     if found_books:
         message = "Here are your results!"
-        results = True
+        return (jsonify(found_books))
     else: 
         message = "Sorry search turned up empty"
+        return (jsonify(message))
     
-    if results: 
-        print("***********!!!!!!!!!!!!!!!!!!")
-        print(found_books)
-        print(message)
     return render_template('books/search_wh.html')

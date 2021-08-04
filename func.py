@@ -38,11 +38,9 @@ class Warehouse:
 
         #count number of findings if more than 10 cap the findings
         number_of_books = int(self.findings['numFound'])
-        if number_of_books > 9: 
-            number_of_books = 9;
+        if number_of_books > 10: 
+            number_of_books = 10;
 
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print(number_of_books)
         #for each book, we need to get additional information i.e. subject, description, and image url
         for doc in range(number_of_books):
 
@@ -52,18 +50,24 @@ class Warehouse:
             book_info = requests.get(book_info_url).json()
             #save subject and description to findings
             self.findings['docs'][doc]['subjects'] = book_info.get('subjects', "No Subjects")
-            self.findings['docs'][doc]['description'] = book_info.get('description', "No Description")
-
+            try:
+                book_info.get("description")
+                try: 
+                    book_info["description"].get("value")
+                    self.findings['docs'][doc]['description'] = book_info["description"].get("value")
+                except:
+                    self.findings['docs'][doc]['description'] = book_info.get("description")
+            except:  
+                self.findings['docs'][doc]['description'] = "No Description"
             #using the self.findings information use either cover edition key if provided or use the edition
-            if self.findings['docs'][doc]['cover_edition_key']:
-                cover_id = self.findings['docs'][doc]['cover_edition_key']
-                self.findings['docs'][doc]['cover_img_url'] = COVER_URL + cover_id + "-M.jpg"
-            else:
-                cover_id = self.findings['docs'][doc]['edition_key']
-                self.findings['docs'][doc]['cover_img_url'] = COVER_URL + cover_id[0] + "-M.jpg"
+            edition_key = self.findings['docs'][doc]['edition_key'][0]
+            cover_id = book_info.get('cover_edition_key', edition_key)
+            self.findings['docs'][doc]['cover_img_url'] = COVER_URL + cover_id + "-M.jpg"
+       
             
             #serialize findings
             book = {
+                'key' : self.findings['docs'][doc]['key'],
                 'title' : self.findings['docs'][doc]['title'],
                 'author' : self.findings['docs'][doc]['author_name'],
                 'description' : self.findings['docs'][doc]['description'],
@@ -72,7 +76,7 @@ class Warehouse:
                 'first_publish_year' : self.findings['docs'][doc]['first_publish_year']
             }
 
+            #append dictionary
             books_found[doc] = book
 
         return books_found
-
