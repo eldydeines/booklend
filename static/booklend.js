@@ -1,5 +1,4 @@
 /** processForm: get data from form and make AJAX call to our API. */
-
 async function processForm(evt) {
 
     evt.preventDefault();
@@ -13,7 +12,12 @@ async function processForm(evt) {
         { params: { title: title, author: author } });
 
     /** Make call to handle the response received */
-    handleResponse(response);
+    if (response.status != 201) {
+        const $showsFoundBooks = $("#shows-found-books");
+        $showsFoundBooks.empty().html(`<h3 class="row" align="center">${response.data}</h3>`);
+    }
+    else
+        handleResponse(response);
 }
 
 /** handleResponse: deal with response from our lucky-num API. */
@@ -28,7 +32,6 @@ function handleResponse(resp) {
 
     let bookCount = Object.keys(searchedBooks);
     bookCount = bookCount.length;
-
 
     for (let book = 0; book <= bookCount; book++) {
 
@@ -55,7 +58,6 @@ function handleResponse(resp) {
         /** Shorten author content for card */
         authors = searchedBooks[book]['author'];
         let allAuthors = "";
-        console.log(authors.length)
         for (let x = 0; x <= authors.length; x++) {
             if (x != 0 && authors[0] != allAuthors) {
                 allAuthors = allAuthors + ", " + authors[0];
@@ -69,26 +71,38 @@ function handleResponse(resp) {
 
         /** Create card to add to DOM for each book */
         let $item = $(
-            `<div class="col-md-6 col-lg-3 Show">
-               <div class="card" data-show-id="${searchedBooks[book]['key']}">
-                 <div class="card-body">
-                   <img class="card-img-top" src="${searchedBooks[book]['cover_img_url']}">
-                   <h5 class="card-title">${searchedBooks[book]['title']}</h5>
-                   <h6 class="card-subtitle mb-2 text-muted">By ${allAuthors}</h6>
-                   <p class="card-text">${description}</p>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Published: ${searchedBooks[book]['first_publish_year']}</li>
-                    <li class="list-group-item">Subject: ${allSubjects}</li>
-                </ul>
-                <div class="card-body">   
-                    <button type="button" class="btn btn-info btn-lg" data-show-id="${searchedBooks[book]['key']}">Add Book to My Library</button>
-                </div>
+            `<div  class="card" data-show-id="${searchedBooks[book]['key']}">
+                <div class="row g-0">
+                    <div class="col-md-2">
+                        <img src="${searchedBooks[book]['cover_img_url']}" class="img-fluid rounded-start m-3" alt="${searchedBooks[book]['title']}">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <h5 class="card-title">${searchedBooks[book]['title']}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">By ${allAuthors}</h6>
+                            <p class="card-text">${description}</p>
+                            <p class="card-text">Published: ${searchedBooks[book]['first_publish_year']}</p>
+                            <p class="card-text">Subjects: ${allSubjects}</p>
+                            <button type="button" class="btn btn-info btn-md" data-book-id="${searchedBooks[book]['key']}">Add Book to My Library</button>
+                        </div>
+                    </div>
+                </div>  
             </div>
         `);
 
+        const $addToLibButton = $(".card-body").find("button");
+        $addToLibButton.on("click", async function (event) {
+            event.preventDefault();
+            const book = event.target;
+            let id = book.getAttribute("data-book-id");
+            let resp = await axios.get("/api/add-book", { params: { key: id } });
+            $(this).text("Added to Library").removeClass("btn btn-info btn-md").addClass("btn btn-secondary btn-md").unbind();
+        });
+
         $showsFoundBooks.append($item);
-    }
+
+    }//end of for loop
+
 
 }
 

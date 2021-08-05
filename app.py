@@ -121,7 +121,7 @@ def logout():
     return redirect('/login')
 
 #--------------------------------------------------------------------------#
-#                   Book Routes
+#                   API Routes
 #--------------------------------------------------------------------------#
 
 @app.route("/findbooks")
@@ -141,9 +141,33 @@ def search_wh():
 
     if found_books:
         message = "Here are your results!"
-        return (jsonify(found_books))
+        return (jsonify(found_books),201)
     else: 
-        message = "Sorry search turned up empty"
+        message = "Sorry, but your search turned up empty. Please try again."
         return (jsonify(message))
     
     return render_template('books/search_wh.html')
+
+#--------------------------------------------------------------------------#
+#                  Book Routes
+#--------------------------------------------------------------------------#
+@app.route('/api/add-book')
+def add_book():
+    """ This will add the book to user's library"""
+    key = request.args['key']
+    print("****************befer**********************")
+    print(g.user)
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    book_to_add = Book.query.filter_by(key=key).first()
+    print("***************book**********************")
+    print(book_to_add)
+    print("****************ADDING**********************")
+
+    book_to_add.user.append(g.user)
+    db.session.commit()      
+
+    return (jsonify("Book Added"),201)
+
