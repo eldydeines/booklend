@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/reset.css">
     <link rel="stylesheet" href="https://bootswatch.com/4/flatly/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css">
     <script src="https://unpkg.com/jquery"></script>
@@ -11,17 +12,19 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light justify-content-between" style="background-color: #e3f2fd;">
+    <nav class="navbar navbar-dark bg-dark justify-content-between">
         <div class="container">
             <a href="/" class="navbar-brand">BookLandia</a>
             <ul class="nav navbar-nav flex-row float-right">
                 {% if not g.user %}
-                <li class="mr-2"><a href="/register">Sign Up |</a></li>
-                <li class="mr-2"><a href="/login">Log In</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/register">Sign Up |</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/login">Log In</a></li>
                 {% else %}
-                <li class="mr-2"><a href="/findbooks">Find Books to Add |</a></li>
-                <li class="mr-2"><a href="/user/library">Your Library |</a></li>
-                <li class="mr-2"><a href="/logout">Log out</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/addbooks">Add Books to Library &nbsp|</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/user/library">Your Library &nbsp|</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/user/requests">Requests &nbsp|</a></li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/logout">Log out &nbsp|&nbsp{{g.user.username}}</a>
+                </li>
                 {% endif %}
             </ul>
         </div>

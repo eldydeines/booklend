@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, session, flash, g, 
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, Book, Status
-from forms import RegisterForm, LoginForm
+from forms import RegisterForm, LoginForm, StatusForm
 from func import Warehouse
 
 #sets up session variable
@@ -137,7 +137,7 @@ def logout():
 #                   API Routes
 #--------------------------------------------------------------------------#
 
-@app.route("/findbooks")
+@app.route("/addbooks")
 def find_books():
     """Render search form"""
     return render_template('books/search_wh.html')
@@ -159,7 +159,6 @@ def search_wh():
         message = "Sorry, but your search turned up empty. Please try again."
         return (jsonify(message))
     
-    return render_template('books/search_wh.html')
 
 #--------------------------------------------------------------------------#
 #                  Book Routes
@@ -179,6 +178,43 @@ def add_book():
     db.session.commit()      
 
     return (jsonify("Book Added"),201)
+
+@app.route('/book/<int:book_id>/update', methods=["GET","POST"])
+def update_book(book_id):
+    """ This will updated specific book for user"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form=StatusForm()
+
+    user_book = Status.query.filter_by(user_id=g.user.user_id,book_id=book_id).one()
+
+    if form.validate_on_submit():
+        location = request.form['location']
+        condition = request.form['condition']
+        user_book.location = location
+        user_book.condition = condition
+        db.session.add(user_book)
+        db.session.commit()
+        flash("Book updated.", "success")
+        return redirect(f"/user/library")
+    return render_template('books/update_bk.html', form=form, book=user_book)
+
+@app.route('/book/<int:book_id>/delete', methods=["POST"])
+def delete_book(book_id):
+    """ Delete a specific book from user's library"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user_book = Status.query.filter_by(user_id=g.user.user_id,book_id=book_id).one()
+    db.session.delete(user_book)
+    db.session.commit()
+    flash("Book removed from library.", "success")
+    return redirect(f"/user/library")
 
 
 #--------------------------------------------------------------------------#

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, DataRequired, Email, Length
 
 class RegisterForm(FlaskForm):
@@ -24,3 +24,9 @@ class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
+
+class StatusForm(FlaskForm):
+    """Update Book Location and Condition"""
+
+    location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('On Loan'), ('Off Shelf')])
+    condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])
