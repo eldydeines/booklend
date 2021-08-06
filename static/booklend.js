@@ -37,7 +37,7 @@ function handleResponse(resp) {
 
         /** Shorten book description for card */
         let description = searchedBooks[book]['description'];
-        if (description.length >= 300) {
+        if ((typeof (description) === "string") && description.length >= 300) {
             description = (description.slice(0, 300)) + "...";
         }
         /** Shorten subject content for card */
@@ -95,7 +95,7 @@ function handleResponse(resp) {
             event.preventDefault();
             const book = event.target;
             let id = book.getAttribute("data-book-id");
-            let resp = await axios.get("/api/add-book", { params: { key: id } });
+            let resp = await axios.get("/book/add-book", { params: { key: id } });
             $(this).text("Added to Library").removeClass("btn btn-info btn-md").addClass("btn btn-secondary btn-md").unbind();
         });
 

@@ -24,13 +24,41 @@ class Warehouse:
         """Add all books found to app library"""
         
         for book in range(num):
+            #Make sure book does not already exist in database
             in_Book_Tbl = Book.query.filter_by(key=self.findings['docs'][book]['key']).one_or_none()
+            
             if in_Book_Tbl is None:
+
+                #Clean up author data before adding to database
+                book_authors = self.findings['docs'][book]['author_name'];
+                all_authors = "";
+                count = 0;
+                if type(book_authors) is list:
+                    for auth in book_authors:
+                        if count != 0:
+                            all_authors = all_authors + ", " + auth
+                        else:
+                            all_authors = all_authors + auth
+                            count = 1;
+
+                #Clean up subject data before adding to database
+                book_subjects = self.findings['docs'][book]['subjects'];
+                all_subjects = "";
+                count = 0;
+                if type(book_subjects) is list:
+                    for subj in book_subjects:
+                        if count != 0:
+                            all_subjects = all_subjects + ", " + subj
+                        else:
+                            all_subjects = all_subjects + subj
+                            count = 1;
+                
+                #add book to book table
                 new_book = Book(key=self.findings['docs'][book]['key'], 
                     title=self.findings['docs'][book]['title'],
-                    author=self.findings['docs'][book]['author_name'],
+                    author=all_authors,
                     description=self.findings['docs'][book]['description'],
-                    subjects=self.findings['docs'][book]['subjects'],
+                    subjects=all_subjects,
                     cover_img_url=self.findings['docs'][book]['cover_img_url'],
                     published_year=self.findings['docs'][book]['first_publish_year'])
                 db.session.add(new_book) 

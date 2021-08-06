@@ -28,16 +28,6 @@ toolbar = DebugToolbarExtension(app)
 #--------------------------------------------------------------------------#
 #                           Start Routes 
 #--------------------------------------------------------------------------#
-
-@app.route('/')
-def home_page():
-    return render_template('index.html')
-
-
-#--------------------------------------------------------------------------#
-#                   Register, Login, and Logout Routes
-#--------------------------------------------------------------------------#
-
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -48,6 +38,31 @@ def add_user_to_g():
     else:
         g.user = None
 
+@app.route('/')
+def homepage():
+    """Show homepage:
+    - anonymous users: will be directed to signup
+    - logged in users: will see list of books on shelves
+    """
+    if g.user:
+        # I was having trouble using the list of Ids and had to reference the solution for this one. 
+        latest_books = (Status
+                    .query
+                    .filter_by(location="On Shelf")
+                    .order_by(Status.timestamp.desc())
+                    .limit(10))
+        print("************STATUS**********")
+        print(latest_books[0])
+        return render_template('home.html', status=latest_books)
+
+    else:
+        return render_template('home-anon.html')
+
+
+
+#--------------------------------------------------------------------------#
+#                   Register, Login, and Logout Routes
+#--------------------------------------------------------------------------#
 
 def do_login(user):
     """Log in user."""
@@ -90,7 +105,7 @@ def register_user():
             return render_template('register.html', form=form)
         do_login(new_user)
         flash('Welcome! Your Account has been created!', "success")
-        return redirect('/')
+        return redirect('/findbooks')
 
     return render_template('register.html', form=form)
 
@@ -151,20 +166,16 @@ def search_wh():
 #--------------------------------------------------------------------------#
 #                  Book Routes
 #--------------------------------------------------------------------------#
-@app.route('/api/add-book')
+@app.route('/book/add-book')
 def add_book():
     """ This will add the book to user's library"""
     key = request.args['key']
-    print("****************befer**********************")
-    print(g.user)
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
     book_to_add = Book.query.filter_by(key=key).first()
-    print("***************book**********************")
-    print(book_to_add)
-    print("****************ADDING**********************")
 
     book_to_add.user.append(g.user)
     db.session.commit()      

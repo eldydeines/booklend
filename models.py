@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -71,12 +72,12 @@ class Book(db.Model):
 
     book_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     key = db.Column(db.Text, nullable=False,  unique=True)
-    title = db.Column(db.String(75), nullable=False)
-    author = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.Text, nullable=False)
+    author = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     subjects = db.Column(db.Text)
     cover_img_url = db.Column(db.Text)
-    published_year = db.Column(db.String(5)) 
+    published_year = db.Column(db.Text)
 
     user = db.relationship('User', secondary='statuses', backref='books')
 
@@ -84,7 +85,6 @@ class Book(db.Model):
         """show info about book in cmd prompt"""
         b = self
         return f"<BOOK book_id={b.book_id} key={b.key}> title={b.title}> author={b.author}>"
-
 
 
 class Status(db.Model):
@@ -97,6 +97,10 @@ class Status(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), primary_key=True)
     location = db.Column(db.String(50), nullable=False, default="On Shelf")
     condition = db.Column(db.String(50), nullable=False, default="Like New")
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+
+    book = db.relationship('Book')
+    user = db.relationship('User')
 
     def __repr__(self):
         """show info about tag in cmd prompt"""
