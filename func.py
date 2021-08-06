@@ -59,7 +59,8 @@ class Warehouse:
                     author=all_authors,
                     description=self.findings['docs'][book]['description'],
                     subjects=all_subjects,
-                    cover_img_url=self.findings['docs'][book]['cover_img_url'],
+                    cover_img_url_m=self.findings['docs'][book]['cover_img_url_m'],
+                    cover_img_url_s=self.findings['docs'][book]['cover_img_url_s'],
                     published_year=self.findings['docs'][book]['first_publish_year'])
                 db.session.add(new_book) 
                 db.session.commit()      
@@ -109,7 +110,8 @@ class Warehouse:
             #using the self.findings information use either cover edition key if provided or use the edition
             edition_key = self.findings['docs'][doc]['edition_key'][0]
             cover_id = book_info.get('cover_edition_key', edition_key)
-            self.findings['docs'][doc]['cover_img_url'] = COVER_URL + cover_id + "-M.jpg"
+            self.findings['docs'][doc]['cover_img_url_m'] = COVER_URL + cover_id + "-M.jpg"
+            self.findings['docs'][doc]['cover_img_url_s'] = COVER_URL + cover_id + "-S.jpg"
 
             #serialize findings
             book = {
@@ -118,7 +120,8 @@ class Warehouse:
                 'author' : self.findings['docs'][doc]['author_name'],
                 'description' : self.findings['docs'][doc]['description'],
                 'subjects' : self.findings['docs'][doc]['subjects'],
-                'cover_img_url' : self.findings['docs'][doc]['cover_img_url'],
+                'cover_img_url_m' : self.findings['docs'][doc]['cover_img_url_m'],
+                'cover_img_url_s' : self.findings['docs'][doc]['cover_img_url_s'],
                 'first_publish_year' : self.findings['docs'][doc]['first_publish_year']
             }
             

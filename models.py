@@ -30,6 +30,8 @@ class User(db.Model):
     fav_book = db.Column(db.Text)
     fav_author = db.Column(db.Text)
 
+    status = db.relationship('Status')
+
     def __repr__(self):
         """show info about user in cmd prompt"""
         u = self
@@ -76,10 +78,12 @@ class Book(db.Model):
     author = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     subjects = db.Column(db.Text)
-    cover_img_url = db.Column(db.Text)
+    cover_img_url_m = db.Column(db.Text)
+    cover_img_url_s = db.Column(db.Text)
     published_year = db.Column(db.Text)
 
     user = db.relationship('User', secondary='statuses', backref='books')
+    status = db.relationship('Status')
 
     def __repr__(self):
         """show info about book in cmd prompt"""

@@ -11,15 +11,16 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-primary justify-content-between ">
+    <nav class="navbar navbar-light justify-content-between" style="background-color: #e3f2fd;">
         <div class="container">
-            <a href="/" class="navbar-brand text-light">BookLandia</a>
+            <a href="/" class="navbar-brand">BookLandia</a>
             <ul class="nav navbar-nav flex-row float-right">
                 {% if not g.user %}
-                <li class="mr-2"><a href="/register">Sign up</a></li>
-                <li class="mr-2"><a href="/login">Log in</a></li>
+                <li class="mr-2"><a href="/register">Sign Up |</a></li>
+                <li class="mr-2"><a href="/login">Log In</a></li>
                 {% else %}
-                <li class="mr-2"><a href="/findbooks">Find Books to Add</a></li>
+                <li class="mr-2"><a href="/findbooks">Find Books to Add |</a></li>
+                <li class="mr-2"><a href="/user/library">Your Library |</a></li>
                 <li class="mr-2"><a href="/logout">Log out</a></li>
                 {% endif %}
             </ul>

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Library</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Book Id</th>
+                <th scope="col">Cover</th>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Location</th>
+                <th scope="col">Condition</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for s in statuses %}
+            <tr>
+                <th scope="row">{{s.book_id}}</th>
+                <td><img src="{{s.book.cover_img_url_s}}" class="img-fluid rounded-start" alt="{{s.book.title}}"></td>
+                <td>{{s.book.title}}</td>
+                <td>{{s.book.author}}</td>
+                <td>{{s.location}}</td>
+                <td>{{s.condition}}</td>
+                <td><a class="btn btn-info btn-md" href="/user/{{s.book_id}}/update">Update Book Status</a></td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

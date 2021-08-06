@@ -51,8 +51,6 @@ def homepage():
                     .filter_by(location="On Shelf")
                     .order_by(Status.timestamp.desc())
                     .limit(10))
-        print("************STATUS**********")
-        print(latest_books[0])
         return render_template('home.html', status=latest_books)
 
     else:
@@ -182,3 +180,24 @@ def add_book():
 
     return (jsonify("Book Added"),201)
 
+
+#--------------------------------------------------------------------------#
+#                  User Routes
+#--------------------------------------------------------------------------#
+@app.route('/user/library')
+def see_library():
+    """For logged in user, show books that they have added to their library"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    book_ids = [status.book_id for status in g.user.status]
+    books = (Book.query
+            .filter(Book.book_id.in_(book_ids))
+            .order_by(Book.title.desc()))
+    statuses = (Status.query
+            .filter(Status.book_id.in_(book_ids))
+            .filter_by(user_id=g.user.user_id))
+    #users_books = (Status.query.filter_by(user_id=g.user.user_id).order_by(Status.book_id.desc()))
+    return render_template('users/library.html', books=books,statuses=statuses)

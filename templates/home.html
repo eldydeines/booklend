@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>BookLandia</h1>
-
-<h2>Latest Books Added To Our Shelves</h2>
+<h1>BookLandia's Latest Book Additions</h1>
 
 {% for s in status %}
 <div class="card">
     <div class="row g-0">
         <div class="col-md-2">
-            <img src="{{s.book.cover_img_url}}" class="img-fluid rounded-start m-3" alt="{{s.book.title}}">
+            <img src="{{s.book.cover_img_url_m}}" class="img-fluid rounded-start m-3" alt="{{s.book.title}}">
         </div>
         <div class="col-md-10">
             <div class="card-body">

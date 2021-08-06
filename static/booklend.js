@@ -74,7 +74,7 @@ function handleResponse(resp) {
             `<div  class="card" data-show-id="${searchedBooks[book]['key']}">
                 <div class="row g-0">
                     <div class="col-md-2">
-                        <img src="${searchedBooks[book]['cover_img_url']}" class="img-fluid rounded-start m-3" alt="${searchedBooks[book]['title']}">
+                        <img src="${searchedBooks[book]['cover_img_url_m']}" class="img-fluid rounded-start m-3" alt="${searchedBooks[book]['title']}">
                     </div>
                     <div class="col-md-10">
                         <div class="card-body">
