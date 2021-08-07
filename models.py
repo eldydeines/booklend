@@ -32,6 +32,7 @@ class User(db.Model):
     fav_author = db.Column(db.Text)
 
     status = db.relationship('Status')
+    borrower = db.relationship('Borrower')
 
     def __repr__(self):
         """show info about user in cmd prompt"""
@@ -123,3 +124,8 @@ class Borrower(db.Model):
     borrower_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"))
     
     user = db.relationship('User')
+
+    def __repr__(self):
+        """show info about tag in cmd prompt"""
+        b = self
+        return f"<BORROWER borrower_id={b.borrower_id} book_id={b.book_id} owner_id={b.status_owner_id}>"

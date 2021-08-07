@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, session, flash, g, 
 from flask.typing import TeardownCallable
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import db, connect_db, User, Book, Status
+from models import db, connect_db, User, Book, Status, Borrower
 from forms import RegisterForm, LoginForm, StatusForm, ProfileForm
 from func import Warehouse
 
@@ -217,6 +217,57 @@ def delete_book(book_id):
     flash("Book removed from library.", "success")
     return redirect(f"/user/library")
 
+@app.route('/book/<int:book_id>/<int:user_id>/request', methods=["POST"])
+def request_book(book_id,user_id):
+    """Update database to show this new request for specified book and book owner"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user_book = Status.query.filter_by(book_id=book_id,user_id=user_id).one()
+    requestor = User.query.get(g.user.user_id)
+    new_borrow = Borrower(book_id=user_book.book_id,
+                        status_owner_id=user_book.user_id,
+                        borrower_id=requestor.user_id)
+    user_book.location = "Requested"
+    db.session.add(new_borrow)
+    db.session.commit()
+
+    flash("Book has been requested.", "success")
+    return redirect('/user/requests')
+
+
+    
+@app.route('/book/<int:book_id>/<int:user_id>/approve', methods=["POST"])
+def approve_request(book_id,user_id):
+    """Book Owner can approve the request and will update status of book"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user_book = Status.query.filter_by(book_id=book_id,user_id=user_id).one()
+    user_book.location = "Checked Out"
+
+    db.session.commit()
+    return redirect ('/user/requests')
+
+@app.route('/book/<int:book_id>/<int:user_id>/reject', methods=["POST"])
+def reject_request(book_id,user_id):
+    """Book Owner can reject the request and remove from Borrower table"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user_book = Status.query.filter_by(book_id=book_id,user_id=user_id).one()
+    user_book.location = "On Shelf"
+    db.session.commit()
+
+    user_borrows = Borrower.query.filter_by(book_id=book_id,status_owner_id=user_id).one()
+    db.session.delete(user_borrows)
+    db.session.commit()
+
+    return redirect ('/user/requests')    
 
 #--------------------------------------------------------------------------#
 #                  User Routes
@@ -248,6 +299,19 @@ def see_profile():
     
     current_user = User.query.get(session[CURR_USER_KEY])
     return render_template('users/profile.html',user=current_user)
+
+
+@app.route('/user/profile/<int:user_id>')
+def see_requestor_profile(user_id):
+    """See requestors profile"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    requestor = User.query.get(user_id)
+    return render_template('users/requestor.html',user=requestor)
+
 
 @app.route('/user/profile/update', methods=["GET", "POST"])
 def update_profile():
@@ -311,3 +375,23 @@ def update_profile():
 
 
     return render_template('users/update.html',user=current_user, form=form)
+
+@app.route('/user/requests')
+def show_requests():
+    """Show all requests that user has made and any requests for their books"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user_borrows = Borrower.query.filter(Borrower.borrower_id==g.user.user_id)
+    user_books = [book.book_id for book in user_borrows]
+    user_users = [user.status_owner_id for user in user_borrows]
+    all_requests = (Status.query
+                    .filter((Status.location=="Requested") | (Status.location=="Checked Out"))
+                    .filter( (Status.user_id==g.user.user_id) | ((Status.book_id.in_(user_books)) & (Status.user_id.in_(user_users))) )
+                    .all())
+    user_borrows = (Borrower.query
+                    .filter((Borrower.borrower_id==g.user.user_id) |(Borrower.status_owner_id==g.user.user_id))
+                    .all())
+    return render_template('users/requests.html', statuses=all_requests, requestor=user_borrows)

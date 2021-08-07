@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-6">
+
+    <h2>Profile
+        <hr>
+    </h2>
+    <h4>Username: {{user.username}}
+        <hr>
+    </h4>
+
+    <h4>Profile:
+        <blockquote class="blockquote m-3">
+            <p>{{user.profile}}</p>
+        </blockquote>
+        <hr>
+    </h4>
+    <h4>Favorite Book: {{user.fav_book}}
+        <hr>
+    </h4>
+    <h4>Favorite Author: {{user.fav_author}}
+        <hr>
+    </h4>
+
+</div>
+{% endblock %}
