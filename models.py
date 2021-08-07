@@ -11,31 +11,6 @@ def connect_db(app):
     db.init_app(app)
 
 
-
-class Log(db.Model):
-    """Shows history of book lending by book id and user id"""
-
-    __tablename__ = "logs"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    book_id = db.Column(db.Integer, db.ForeignKey("books.book_id",ondelete="cascade"))
-    owner_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"))
-    borrower_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"))
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    status = db.Column(db.String(50), nullable=False, default="Requested")
-    start_date = db.Column(db.DateTime)
-    end_date = db.Column(db.DateTime)
-
-    book = db.relationship('Book')
-    user = db.relationship('User')
-    status = db.relationship('Status')
-
-    def __repr__(self):
-        """show info about tag in cmd prompt"""
-        l = self
-        return f"<LOG id={l.id} owner={l.username} borrower={l.username}>"
-
-
 class User(db.Model):
 
     __tablename__ = 'users'
@@ -57,19 +32,6 @@ class User(db.Model):
     fav_author = db.Column(db.Text)
 
     status = db.relationship('Status')
-    owner = db.relationship(
-        "User",
-        secondary="logs",
-        primaryjoin=(Log.owner_id == user_id),
-        secondaryjoin=(Log.borrower_id == user_id)
-    )
-
-    borrower = db.relationship(
-        "User",
-        secondary="logs",
-        primaryjoin=(Log.borrower_id == user_id),
-        secondaryjoin=(Log.owner_id == user_id)
-    )
 
     def __repr__(self):
         """show info about user in cmd prompt"""
@@ -150,3 +112,14 @@ class Status(db.Model):
         s = self
         return f"<STATUS book_id={s.book_id} user_id={s.user_id}>"
 
+class Borrower(db.Model):
+    """ Joins together a book with a borrower. """
+
+    __tablename__ = "borrowers"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    book_id = db.Column(db.Integer)
+    status_owner_id = db.Column(db.Integer)
+    borrower_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"))
+    
+    user = db.relationship('User')

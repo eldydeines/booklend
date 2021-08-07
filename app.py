@@ -8,7 +8,7 @@ from forms import RegisterForm, LoginForm, StatusForm
 from func import Warehouse
 
 #sets up session variable
-CURR_USER_KEY = ""
+CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
@@ -103,7 +103,7 @@ def register_user():
             return render_template('register.html', form=form)
         do_login(new_user)
         flash('Welcome! Your Account has been created!', "success")
-        return redirect('/findbooks')
+        return redirect('/addbooks')
 
     return render_template('register.html', form=form)
 
@@ -138,7 +138,7 @@ def logout():
 #--------------------------------------------------------------------------#
 
 @app.route("/addbooks")
-def find_books():
+def add_books():
     """Render search form"""
     return render_template('books/search_wh.html')
 
@@ -173,7 +173,7 @@ def add_book():
         return redirect("/")
     
     book_to_add = Book.query.filter_by(key=key).first()
-
+        
     book_to_add.user.append(g.user)
     db.session.commit()      
 
@@ -229,11 +229,10 @@ def see_library():
         return redirect("/")
     
     book_ids = [status.book_id for status in g.user.status]
-    books = (Book.query
-            .filter(Book.book_id.in_(book_ids))
-            .order_by(Book.title.desc()))
+ 
     statuses = (Status.query
             .filter(Status.book_id.in_(book_ids))
-            .filter_by(user_id=g.user.user_id))
+            .filter_by(user_id=g.user.user_id)
+            .order_by(Status.timestamp.desc()))
     #users_books = (Status.query.filter_by(user_id=g.user.user_id).order_by(Status.book_id.desc()))
-    return render_template('users/library.html', books=books,statuses=statuses)
+    return render_template('users/library.html',statuses=statuses)

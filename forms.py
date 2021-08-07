@@ -28,5 +28,5 @@ class LoginForm(FlaskForm):
 class StatusForm(FlaskForm):
     """Update Book Location and Condition"""
 
-    location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('On Loan'), ('Off Shelf')])
+    location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('Checked Out'), ('Off Shelf')])
     condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])

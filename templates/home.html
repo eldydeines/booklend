@@ -19,7 +19,14 @@
                         class="text-muted"><mark>{{s.condition}}</small></mark> </p>
                 <p class="card-text">{{s.book.description}}</p>
                 <p class="card-text"><em>Subjects: {{s.book.subjects}}</em></p>
-                <a class="btn btn-info btn-md" href="/book/{{s.book_id}}/reserve">Reserve Book</a>
+
+                {% if s.user_id != g.user.user_id %}
+                <a class="btn btn-info btn-md" href="/book/{{s.book_id}}/reserve"><i class="fas fa-book-reader"></i>
+                    &nbspRequest This Book</a>
+
+                {% else %}
+                <h6 class="card-subtitle mb-2 text-muted"><i class="fas fa-book"></i>&nbspYou own this book.</h6>
+                {% endif %}
             </div>
         </div>
     </div>
