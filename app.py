@@ -178,6 +178,30 @@ def add_book():
 
     return (jsonify("Book Added"),201)
 
+@app.route('/search')
+def search_booklandia():
+    """ This will add the book to user's library"""
+ 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    term = request.args["term"]
+    search_term = "%{}%".format(term) 
+   
+    findings = (Book.query
+            .filter((Book.title.like(search_term)) | (Book.author.like(search_term)) | (Book.description.like(search_term)))
+            .order_by(Book.title.desc())
+            .all())
+
+    found_books_ids = [book.book_id for book in findings]
+
+    found_books = (Status.query
+                    .filter(Status.book_id.in_(found_books_ids))
+                    .limit(20))
+
+    return render_template('books/results.html', status=found_books)
+
 @app.route('/book/<int:book_id>/update', methods=["GET","POST"])
 def update_book(book_id):
     """ This will updated specific book for user"""
