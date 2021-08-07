@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-sm-6">
+
+    <div class="row justify-content-md-center">
+
+        <h2>Profile</h2>
+        <h3>Username: {{user.username}}</h3>
+        <h4>Fullname: {{user.first_name}} {{user.last_name}}</h4>
+        <h4>Address:
+            <blockquote class="blockquote">
+                <p>{{user.address1}}</p>
+                {% if user.address1 %}<p>{{user.address2}}</p>{% endif%}
+                <p>{{user.town}}, {{user.state}} {{user.zip}}</p>
+            </blockquote>
+        </h4>
+        <h4>Phone: {{user.phone}}</h4>
+        <h4>Email: {{user.email}}</h4>
+        <h4>Profile:
+            <blockquote class="blockquote">
+                <p>{{user.profile}}</p>
+            </blockquote>
+        </h4>
+        <h4>Favorite Book: {{user.fav_book}}</h4>
+        <h4>Favorite Author: {{user.fav_author}}</h4>
+        <a class="btn btn-info btn-md" href="/user/profile/update"><i class="fas fa-user-circle"></i>
+            &nbspUpdate Profile</a>
+
+    </div>
+
+</div>
+{% endblock %}

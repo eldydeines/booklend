@@ -1,10 +1,11 @@
 import os
 from threading import ThreadError
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
+from flask.typing import TeardownCallable
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, Book, Status
-from forms import RegisterForm, LoginForm, StatusForm
+from forms import RegisterForm, LoginForm, StatusForm, ProfileForm
 from func import Warehouse
 
 #sets up session variable
@@ -236,3 +237,77 @@ def see_library():
             .order_by(Status.timestamp.desc()))
     #users_books = (Status.query.filter_by(user_id=g.user.user_id).order_by(Status.book_id.desc()))
     return render_template('users/library.html',statuses=statuses)
+
+@app.route('/user/profile')
+def see_profile():
+    """For Logged in User, show profile"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    current_user = User.query.get(session[CURR_USER_KEY])
+    return render_template('users/profile.html',user=current_user)
+
+@app.route('/user/profile/update', methods=["GET", "POST"])
+def update_profile():
+    """For Logged in User, update their profile information"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = ProfileForm()
+    current_user = User.query.get(session[CURR_USER_KEY])
+
+    if form.validate_on_submit():
+        pword_entered = request.form['password']
+        if User.authenticate(current_user.username, pword_entered):
+
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
+            address1 = request.form['address1']
+            address2 = request.form['address2']
+            town = request.form['town']
+            state =  request.form['state']
+            zip = request.form['zip']
+            phone =  request.form['phone']
+            email = request.form['email']
+            profile = request.form['profile']
+            fav_book = request.form['fav_book']
+            fav_author = request.form['fav_author']
+
+            
+            if first_name: 
+                current_user.first_name = first_name
+            if last_name: 
+                current_user.last_name = last_name
+            if address1: 
+                current_user.address1 = address1
+            if address2: 
+                current_user.address2 = address2
+            if town: 
+                current_user.town = town
+            if state:
+                current_user.state = state
+            if zip: 
+                current_user.zip = zip
+            if phone: 
+                current_user.phone = phone
+            if email: 
+                current_user.email = email
+            if profile: 
+                current_user.profile = profile
+            if fav_book:
+                current_user.fav_book = fav_book
+            if fav_author:
+                current_user.fav_author = fav_author
+
+            db.session.commit()
+            flash("Profile has been updated.","success")
+            return redirect(f"/user/profile")
+
+        flash("Password incorrect. Profile updates not saved.","warning")
+
+
+    return render_template('users/update.html',user=current_user, form=form)

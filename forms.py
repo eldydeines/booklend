@@ -30,3 +30,19 @@ class StatusForm(FlaskForm):
 
     location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('Checked Out'), ('Off Shelf')])
     condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])
+
+class ProfileForm(FlaskForm):
+    
+    first_name = StringField("First Name")
+    last_name = StringField("Last Name")   
+    address1 = StringField("Address (Line 1)")  
+    address2 = StringField("Address (Line 2")  
+    town = StringField("City/Town")  
+    state = StringField("State")  
+    zip = StringField("Zip")
+    phone = StringField("Phone")  
+    email = StringField("Email") 
+    profile = TextAreaField("Profile", description="Brief Description About Yourself")
+    fav_book = StringField("Favorite Book") 
+    fav_author = StringField("Favorite Author") 
+    password = PasswordField('Please enter your password to save updates.', validators=[InputRequired()])
