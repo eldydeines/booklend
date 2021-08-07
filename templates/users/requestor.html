@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-md-6">
+<div class="col-md-12">
 
     <h2>Profile
+        <hr>
+        <hr>
         <hr>
     </h2>
     <h4>Username: {{user.username}}
@@ -21,7 +23,50 @@
     </h4>
     <h4>Favorite Author: {{user.fav_author}}
         <hr>
+        <hr>
+        <hr>
     </h4>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+
+            <h4><i class="fas fa-book fa-2x"></i><strong> Book Shelf</strong></h4>
+            <thead>
+                <tr>
+                    <th scope="col">Book Id</th>
+                    <th scope="col">Cover</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Condition</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for s in statuses %}
+                <tr>
+                    <th scope="row">{{s.book_id}}</th>
+                    <td><img src="{{s.book.cover_img_url_s}}" class="img-fluid rounded-start" alt="{{s.book.title}}">
+                    </td>
+                    <td>{{s.book.title}}</td>
+                    <td>{{s.book.author}}</td>
+                    <td>{{s.location}}</td>
+                    <td>{{s.condition}}</td>
+                    <td>
+                        <form method="POST" action="/book/{{s.book_id}}/{{s.user_id}}/request">
+                            <button class="btn btn-info btn-md" type="submit"><i class="fas fa-book-reader"></i>
+                                &nbspRequest This Book</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
 
 </div>
 {% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Requests Made</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">Profile</th>
+                <th scope="col">Favorite Book</th>
+                <th scope="col">Favorite Author</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for u in users %}
+            <tr>
+                <th scope="row">{{u.user_id}}</th>
+                <td>{{u.username}}</td>
+                <td>{{u.profile}}</td>
+                <td>{{u.fav_book}}</td>
+                <td>{{u.fav_author}}</td>
+
+                <td>
+                    {% if u.user_id == g.user.user_id %}
+                    <a href="/user/library">
+                        {% else %}
+                        <a href="/user/profile/{{u.user_id}}">
+                            {% endif %}
+                            <i class="fas fa-user-circle"></i>
+                            {{u.username}} Book Shelf</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

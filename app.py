@@ -57,8 +57,6 @@ def homepage():
     else:
         return render_template('home-anon.html')
 
-
-
 #--------------------------------------------------------------------------#
 #                   Register, Login, and Logout Routes
 #--------------------------------------------------------------------------#
@@ -237,7 +235,6 @@ def request_book(book_id,user_id):
     flash("Book has been requested.", "success")
     return redirect('/user/requests')
 
-
     
 @app.route('/book/<int:book_id>/<int:user_id>/approve', methods=["POST"])
 def approve_request(book_id,user_id):
@@ -272,6 +269,13 @@ def reject_request(book_id,user_id):
 #--------------------------------------------------------------------------#
 #                  User Routes
 #--------------------------------------------------------------------------#
+
+@app.route('/users/all')
+def see_all_users():
+    """See a list of all users"""
+    users = User.query.all()
+    return render_template('users/all.html',users=users)
+
 @app.route('/user/library')
 def see_library():
     """For logged in user, show books that they have added to their library"""
@@ -310,7 +314,12 @@ def see_requestor_profile(user_id):
         return redirect("/")
 
     requestor = User.query.get(user_id)
-    return render_template('users/requestor.html',user=requestor)
+
+    statuses = (Status.query
+            .filter_by(user_id=requestor.user_id)
+            .order_by(Status.timestamp.desc()))
+
+    return render_template('users/requestor.html',user=requestor,statuses=statuses)
 
 
 @app.route('/user/profile/update', methods=["GET", "POST"])

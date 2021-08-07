@@ -15,11 +15,21 @@
     <nav class="navbar navbar-dark bg-dark justify-content-between">
         <div class="container">
             <a href="/" class="navbar-brand">BookLandia</a>
+
+
             <ul class="nav navbar-nav flex-row float-right">
                 {% if not g.user %}
                 <li class="nav-item mr-2"><a class="nav-link" href="/register">Sign Up |</a></li>
                 <li class="nav-item mr-2"><a class="nav-link" href="/login">Log In</a></li>
                 {% else %}
+                <li class="nav-item mr-2">
+                    <form class="d-flex" action="/">
+                        <input class="form-control me-2" type="search" placeholder="Search Shelves" aria-label="Search">
+                        <button class="btn btn-success ml-1" type="submit">Search</button>
+                    </form>
+                </li>
+                <li class="nav-item mr-2"><a class="nav-link" href="/users/all"><i class="fas fa-users"></i>
+                        BookLandiers&nbsp| </a></li>
                 <li class="nav-item mr-2"><a class="nav-link" href="/addbooks">Add Books to Library &nbsp|</a></li>
                 <li class="nav-item mr-2"><a class="nav-link" href="/user/library">Your Library &nbsp|</a></li>
                 <li class="nav-item mr-2"><a class="nav-link" href="/user/requests">Requests &nbsp|</a></li>
