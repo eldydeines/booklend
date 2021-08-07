@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-sm-6">
+<div class="col-md-8">
 
-    <div class="row justify-content-md-center">
 
-        <h2>Profile Update</h2>
-        <h3>Username: {{user.username}}</h3>
 
-        <form method="POST" id="profile_form">
-            {{ form.hidden_tag() }}
+    <h2>{{user.username}} - Profile Update
+        <hr>
+    </h2>
 
-            {% for field in form if field.widget.input_type != 'hidden' %}
-            {% for error in field.errors %}
-            <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-            {{ field(placeholder=field.label.text, class="form-control") }}
-            {% endfor %}
+    <form method="POST" id="profile_form">
+        {{ form.hidden_tag() }}
 
-            <button class="btn btn-primary btn-lg btn-block">Save</button>
-        </form>
+        {% for field in form if field.widget.input_type != 'hidden' %}
+        {% for error in field.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+        {{ field(placeholder=field.label.text, class="form-control mt-2") }}
+        {% endfor %}
 
-    </div>
+        <button class="btn btn-primary btn-lg btn-block mt-2">Save</button>
+    </form>
+
 
 </div>
 {% endblock %}

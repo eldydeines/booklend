@@ -1,33 +1,50 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-sm-6">
+<div class="col-md-6">
 
-    <div class="row justify-content-md-center">
 
-        <h2>Profile</h2>
-        <h3>Username: {{user.username}}</h3>
-        <h4>Fullname: {{user.first_name}} {{user.last_name}}</h4>
-        <h4>Address:
-            <blockquote class="blockquote">
-                <p>{{user.address1}}</p>
-                {% if user.address1 %}<p>{{user.address2}}</p>{% endif%}
-                <p>{{user.town}}, {{user.state}} {{user.zip}}</p>
-            </blockquote>
-        </h4>
-        <h4>Phone: {{user.phone}}</h4>
-        <h4>Email: {{user.email}}</h4>
-        <h4>Profile:
-            <blockquote class="blockquote">
-                <p>{{user.profile}}</p>
-            </blockquote>
-        </h4>
-        <h4>Favorite Book: {{user.fav_book}}</h4>
-        <h4>Favorite Author: {{user.fav_author}}</h4>
-        <a class="btn btn-info btn-md" href="/user/profile/update"><i class="fas fa-user-circle"></i>
-            &nbspUpdate Profile</a>
 
-    </div>
+    <h2>Profile
+        <hr>
+    </h2>
+    <h4>Username: {{user.username}}
+        <hr>
+    </h4>
+    <h4>Full Name: {{user.first_name}} {{user.last_name}}
+        <hr>
+    </h4>
+    <h4>Address:
+        <blockquote class="blockquote m-3">
+            <p>{{user.address1}}</p>
+            {% if user.address1 %}<p>{{user.address2}}</p>{% endif%}
+            <p>{{user.town}}, {{user.state}} {{user.zip}}</p>
+        </blockquote>
+    </h4>
+    <h4>Phone: <blockquote class="blockquote m-3">{{user.phone}}</blockquote>
+    </h4>
+    <hr>
+
+
+    <h4>Email: {{user.email}}
+        <hr>
+    </h4>
+    <h4>Profile:
+        <blockquote class="blockquote m-3">
+            <p>{{user.profile}}</p>
+        </blockquote>
+        <hr>
+    </h4>
+    <h4>Favorite Book: {{user.fav_book}}
+        <hr>
+    </h4>
+    <h4>Favorite Author: {{user.fav_author}}
+        <hr>
+    </h4>
+    <a class="btn btn-info btn-md" href="/user/profile/update"><i class="fas fa-user-circle"></i>
+        &nbspUpdate Profile</a>
+
+
 
 </div>
 {% endblock %}
