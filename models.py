@@ -85,6 +85,7 @@ class Book(db.Model):
     published_year = db.Column(db.Text)
 
     user = db.relationship('User', secondary='statuses', backref='books')
+    
     status = db.relationship('Status')
 
     def __repr__(self):
@@ -107,7 +108,8 @@ class Status(db.Model):
 
     book = db.relationship('Book')
     user = db.relationship('User')
-
+    
+    
     def __repr__(self):
         """show info about tag in cmd prompt"""
         s = self
@@ -129,3 +131,22 @@ class Borrower(db.Model):
         """show info about tag in cmd prompt"""
         b = self
         return f"<BORROWER borrower_id={b.borrower_id} book_id={b.book_id} owner_id={b.status_owner_id}>"
+
+
+class BookRating(db.Model):
+    """ Joins together a book with a borrower. """
+
+    __tablename__ = "books_ratings"
+
+    book_rated = db.Column(db.Integer, db.ForeignKey("books.book_id",ondelete="cascade"), primary_key=True)
+    user_rating = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"), primary_key=True)
+    rating = db.Column(db.Integer)
+    review = db.Column(db.Text)
+
+    book = db.relationship('Book')
+    user = db.relationship('User')
+
+    def __repr__(self):
+        """show info about tag in cmd prompt"""
+        b = self
+        return f"<BOOKRATING book={b.book_rated} user={b.user_rating}>"

@@ -4,8 +4,9 @@ from flask import Flask, render_template, request, redirect, session, flash, g, 
 from flask.typing import TeardownCallable
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from models import db, connect_db, User, Book, Status, Borrower
-from forms import RegisterForm, LoginForm, StatusForm, ProfileForm
+from sqlalchemy.sql import func
+from models import BookRating, db, connect_db, User, Book, Status, Borrower, BookRating
+from forms import RegisterForm, LoginForm, StatusForm, ProfileForm, BookReviewForm
 from func import Warehouse
 
 #sets up session variable
@@ -52,7 +53,19 @@ def homepage():
                     .filter_by(location="On Shelf")
                     .order_by(Status.timestamp.desc())
                     .limit(10))
-        return render_template('home.html', status=latest_books)
+
+        books_ids = [book.book_id for book in latest_books]
+        book_ratings_avg = {}
+        for book in books_ids: 
+            average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating).label('average'))
+                        .filter(BookRating.book_rated==book).group_by(BookRating.book_rated).all())
+            if average_rating:
+                temp = str(average_rating)
+                temp2 = temp.split("'")
+                temp = float(temp2[1])
+                book_ratings_avg[f'{book}'] = '{:,}'.format(round(temp,1))
+        print("*****************",book_ratings_avg)
+        return render_template('home.html', status=latest_books, avgs=book_ratings_avg)
 
     else:
         return render_template('home-anon.html')
@@ -290,6 +303,30 @@ def reject_request(book_id,user_id):
 
     return redirect ('/user/requests')    
 
+@app.route('/book/<int:book_id>/<int:user_id>/review', methods=["GET","POST"])
+def review_book(book_id,user_id):
+    """Logged in user can write a review and provide a rating on any book"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form=BookReviewForm()
+
+    book_under_review = Book.query.get(book_id)
+    user = User.query.get(user_id)
+
+    if form.validate_on_submit():
+        rating = request.form['rating']
+        review = request.form['review']
+        new_rating = BookRating(book_rated=book_under_review.book_id, 
+                    user_rating=user.user_id,rating=rating,review=review)
+        db.session.add(new_rating)
+        db.session.commit()
+        flash("Rating and review added.", "success")
+        return redirect("/")
+
+    return render_template('books/review.html', form=form, book=book_under_review)
 #--------------------------------------------------------------------------#
 #                  User Routes
 #--------------------------------------------------------------------------#

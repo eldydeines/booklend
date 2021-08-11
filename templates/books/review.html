@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-12">
+    <h1 class="text-center" align="center">BookLandia</h1>
+
+    <p align="center">Book Review</p>
+
+
+    <div class="row g-0">
+
+        <div class="col-md-3">
+
+            <img src="{{book.cover_img_url_m}}" class="img-fluid rounded-start mb-2" alt="{{book.title}}">
+            <h5>{{book.title}}</h5>
+            <h6 class="text-muted">By {{book.author}}</h6>
+            <p>Published: {{book.published_year}}</p>
+
+        </div>
+
+        <div class="form-group col-9 border-start">
+
+            <form method="POST">
+
+                {{ form.hidden_tag() }}
+
+                {% for field in form
+                if field.widget.input_type != 'hidden' %}
+                <p>
+                    {{ field.label }}
+                    {{ field(class_="form-control") }}
+
+                    {% for error in field.errors %}
+                    <span class="form-text text-danger">{{ error }}</span>
+                    {% endfor %}
+                </p>
+                {% endfor %}
+
+                <button class="btn btn-success p-1">Post Review</button>
+
+            </form>
+            <a class="btn btn-primary text-light mt-3" href="/">Cancel</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

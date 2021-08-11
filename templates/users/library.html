@@ -26,7 +26,12 @@
                 <td>{{s.book.author}}</td>
                 <td>{{s.location}}</td>
                 <td>{{s.condition}}</td>
-                <td><a class="btn btn-info btn-md" href="/book/{{s.book_id}}/update">Update Book Status</a></td>
+                <td>
+                    <a class="btn btn-info btn-md" href="/book/{{s.book_id}}/update">Update Book Status</a>
+                    <a class="btn btn-primary btn-md ml-2" href="/book/{{s.book_id}}/{{g.user.user_id}}/review">
+                        <i class="fas fa-star"></i>
+                        Add Review</a>
+                </td>
             </tr>
             {% endfor %}
 

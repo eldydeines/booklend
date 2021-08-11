@@ -8,6 +8,7 @@
     <div class="row g-0">
         <div class="col-md-2">
             <img src="{{s.book.cover_img_url_m}}" class="img-fluid rounded-start m-3" alt="{{s.book.title}}">
+
         </div>
         <div class="col-md-10">
             <div class="card-body">
@@ -21,17 +22,25 @@
                 <p class="card-text"><em>Subjects: {{s.book.subjects}}</em></p>
 
                 {% if s.user_id != g.user.user_id %}
-                <form method="POST" action="/book/{{s.book_id}}/{{s.user_id}}/request">
-                    <button class="btn btn-info btn-md" type="submit"><i class="fas fa-book-reader"></i>
+
+                <form method="POST" action="/book/{{s.book_id}}/{{s.user_id}}/request" style="display: inline;">
+                    <button class="btn btn-info btn-md p-1" type="submit"><i class="fas fa-book-reader"></i>
                         &nbspRequest This Book</button>
                 </form>
+
                 {% else %}
-                <h6 class="card-subtitle mb-2 text-muted"><i class="fas fa-book"></i>&nbspYou own this book.</h6>
+
+                <h6 class="card-subtitle mb-2 text-muted" style="display: inline;"><i class="fas fa-book"></i>&nbspYou
+                    own this book.</h6>
                 {% endif %}
+                <a class="btn btn-primary btn-md ml-2" style="display: inline;"
+                    href="/book/{{s.book_id}}/{{g.user.user_id}}/review">
+                    <i class="fas fa-star"></i>
+                    Add Review</a>
+
             </div>
         </div>
     </div>
 </div>
 {% endfor %}
-
 {% endblock %}

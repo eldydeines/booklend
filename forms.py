@@ -32,6 +32,7 @@ class StatusForm(FlaskForm):
     condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])
 
 class ProfileForm(FlaskForm):
+    """Update user's profile"""
     
     first_name = StringField("First Name")
     last_name = StringField("Last Name")   
@@ -46,3 +47,13 @@ class ProfileForm(FlaskForm):
     fav_book = StringField("Favorite Book") 
     fav_author = StringField("Favorite Author") 
     password = PasswordField('Please enter your password to save updates.', validators=[InputRequired()])
+
+class BookReviewForm(FlaskForm):
+    """Book review form"""
+    
+    rating = SelectField(u'Rating', choices=[(5, '5 Stars: Drop Everything and Read Now!'), 
+    (4, '4 Stars: Pretty Good, Would Recommend to Friends'), 
+    (3, '3 Stars: Eh, In between'), 
+    (2,'2 Stars: Struggled to finish'),
+    (1, '1 Star: Do Not Bother')])
+    review = TextAreaField(u'Book Review',validators=[InputRequired()])
