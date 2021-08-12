@@ -10,8 +10,6 @@
         <div class="col-md-2">
             <img src="{{s.book.cover_img_url_m}}" class="img-fluid rounded-start m-3" alt="{{s.book.title}}">
 
-
-
             <div align="center">
                 <h4 class="text-primary fw-bold ml-2">Book Rating</h4>
                 <span class="text-primary">
@@ -52,14 +50,10 @@
                 </span>
             </div>
 
-
-
-
-
         </div>
         <div class="col-md-10">
             <div class="card-body">
-                <h5 class="card-title">{{s.book.title}}</h5>
+                <h5 class="card-title"><a href="/book/{{s.book_id}}">{{s.book.title}}</a></h5>
                 <h6 class="card-subtitle mb-2 text-muted">By {{s.book.author}}</h6>
                 <p class="card-text">Published: <small class="text-muted"><mark>{{s.book.published_year}}
                         </mark></small>
