@@ -1,6 +1,32 @@
+#--------------------------------------------------------------------------#
+#  Capstone Project:  BookLandia
+#  I used WTForms to validate input and assign input types for forms.
+#
+#  Register Form - collects user profile information to register with the app
+#  Login Form - collects username and password to login
+#  Status Form - collects book location and condition information from user
+#  Profile Form - collects profile updates from user
+#  BookReview Form - collects book's rating and review from user
+#  References: 
+#  --- Previous projects in GitHub Repository 
+#  --- SpringBoard Exercises & Lessons
+#  
+#  By: Eldy Deines  Date: 8/11/2021
+#--------------------------------------------------------------------------#
+
+
+#--------------------------------------------------------------------------#
+#                           Import Necessary Libraries 
+#--------------------------------------------------------------------------#
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, DataRequired, Email, Length
+
+
+#--------------------------------------------------------------------------#
+#                           Forms
+#--------------------------------------------------------------------------#
 
 class RegisterForm(FlaskForm):
     """Form to register users"""
@@ -26,11 +52,13 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
 
+
 class StatusForm(FlaskForm):
     """Form for a user to update Book Location and Condition"""
 
     location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('Checked Out'), ('Off Shelf')])
     condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])
+
 
 class ProfileForm(FlaskForm):
     """ Form to update a user's profile"""
@@ -48,6 +76,7 @@ class ProfileForm(FlaskForm):
     fav_book = StringField("Favorite Book") 
     fav_author = StringField("Favorite Author") 
     password = PasswordField('Please enter your password to save updates.', validators=[InputRequired()])
+
 
 class BookReviewForm(FlaskForm):
     """Form to review books"""
