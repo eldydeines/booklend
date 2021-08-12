@@ -1,9 +1,38 @@
+#--------------------------------------------------------------------------#
+#  Capstone Project:  BookLandia
+#  Several models were needed for this project. Troubleshooting using psql.
+#  User Model - contains all profile information for user 
+#               and class functions for authentication
+#  Book Model - contains all book information
+#  Status Model- links many books to many users
+#  Borrower Model - shows who has requested/borrowed the owner's book
+#  BookRating Model - saves all ratings and reviews for many
+#               users to many books
+#
+#  References: 
+#  --- SQLAlchemy Documentation Website
+#  --- Previous projects in GitHub Repository 
+#  --- SpringBoard Exercises & Lessons
+#  
+#  By: Eldy Deines  Date: 8/11/2021
+#--------------------------------------------------------------------------#
+
+
+#--------------------------------------------------------------------------#
+#                           Import Necessary Libraries 
+#--------------------------------------------------------------------------#
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
+
+
+#--------------------------------------------------------------------------#
+#                           Connect the app to the DB 
+#--------------------------------------------------------------------------#
 
 def connect_db(app):
     """Connect to database."""
@@ -12,6 +41,7 @@ def connect_db(app):
 
 
 class User(db.Model):
+    """Table for user profiles. One to Many"""
 
     __tablename__ = 'users'
 
@@ -71,6 +101,7 @@ class User(db.Model):
 
 
 class Book(db.Model):
+    """Table for all books and their details.  One to many """
 
     __tablename__ = 'books'
 
@@ -96,7 +127,7 @@ class Book(db.Model):
 
 
 class Status(db.Model):
-    """ Joins together a book with a user. It's the user's libary """
+    """ Joins together a book with a user. Many to many relationship """
 
     __tablename__ = "statuses"
 
@@ -116,8 +147,9 @@ class Status(db.Model):
         s = self
         return f"<STATUS book_id={s.book_id} user_id={s.user_id}>"
 
+
 class Borrower(db.Model):
-    """ Joins together a book with a borrower. """
+    """ Joins together a book with a borrower. Many to many """
 
     __tablename__ = "borrowers"
 
@@ -135,7 +167,7 @@ class Borrower(db.Model):
 
 
 class BookRating(db.Model):
-    """ Joins together a book with a borrower. """
+    """ Joins together books and users for ratings and reviews. Many to Many """
 
     __tablename__ = "books_ratings"
 
