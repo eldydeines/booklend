@@ -476,19 +476,32 @@ def update_book_review(book_id,user_id):
     
     return render_template('books/update_rv.html', form=form, book=book_under_review)
 
+
+#--------------------------------------------------------------------------#
 #--------------------------------------------------------------------------#
 #                  User Routes
 #--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
+
 
 @app.route('/users/all')
 def see_all_users():
-    """See a list of all users"""
+    """Render a list of all users only if you are a logged in user"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     users = User.query.all()
     return render_template('users/all.html',users=users)
 
+
 @app.route('/user/library')
 def see_library():
-    """For logged in user, show books that they have added to their library"""
+    """For logged in user, show books that they have added to their library.
+       This will also render buttons to update status and update reviews so this will
+       query status table and book ratings table as well.
+    """
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -508,9 +521,10 @@ def see_library():
 
     return render_template('users/library.html',statuses=statuses, reviews=reviews_book_ids)
 
+
 @app.route('/user/profile')
 def see_profile():
-    """For Logged in User, show profile"""
+    """For Logged in User, show the user's profile by querying the user table."""
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -522,7 +536,10 @@ def see_profile():
 
 @app.route('/user/profile/<int:user_id>')
 def see_requestor_profile(user_id):
-    """See requestors profile"""
+    """This routes shows a profile of another user not the logged in user.
+       Queries the status to show which books they own.  Queries the book rating table
+       to show what books they have rated with the rating and review. 
+    """
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -543,7 +560,9 @@ def see_requestor_profile(user_id):
 
 @app.route('/user/profile/update', methods=["GET", "POST"])
 def update_profile():
-    """For Logged in User, update their profile information"""
+    """For Logged in User, they can update their profile if they can enter their password correctly.
+       If password incorrect, they will have to keep trying or move to another page. They will have 
+       the ability to update all fields except username and password."""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -606,7 +625,10 @@ def update_profile():
 
 @app.route('/user/requests')
 def show_requests():
-    """Show all requests that user has made and any requests for their books"""
+    """For logged in user, this will query the borrowers table to see what has been 
+    "borrowed/requested" by user. Additionally, we show all books owned by user and those
+    statuses.  We end up showing what is relevant for that particular user. 
+    """
 
     if not g.user:
         flash("Access unauthorized.", "danger")
