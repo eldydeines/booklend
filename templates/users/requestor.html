@@ -65,7 +65,72 @@
             </tbody>
         </table>
     </div>
+</div>
+
+<hr>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <h4><i class="fas fa-star fa-2x"></i><strong> Book Reviews</strong></h4>
+        <thead>
+            <tr>
+                <th scope="col">Book Id</th>
+                <th scope="col">Book Title</th>
+                <th scope="col">Rating</th>
+                <th scope="col">Review</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for r in ratings %}
 
 
+            <tr>
+                <th scope="row">{{r.book.book_id}}</th>
+                <td>{{r.book.title}}</td>
+                <td>
+                    <span class="text-primary">
+                        {% if r.rating == 0 or r.rating == None -%}
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        {% elif r.rating > 1 and r.rating <= 1.5 -%} <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            {% elif r.rating > 1.5 and r.rating <= 2.5 -%} <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                {% elif r.rating > 2.5 and r.rating <= 3.5 -%} <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    {% elif r.rating > 3.5 and r.rating <= 4.5 -%} <i class="fas fa-star">
+                                        </i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        {% else -%}
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        {% endif %}
+                </td>
+
+                <td>{{r.review}}</td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
 </div>
 {% endblock %}

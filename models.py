@@ -83,6 +83,7 @@ class Book(db.Model):
     cover_img_url_m = db.Column(db.Text)
     cover_img_url_s = db.Column(db.Text)
     published_year = db.Column(db.Text)
+    avg_rating = db.Column(db.Float)
 
     user = db.relationship('User', secondary='statuses', backref='books')
     

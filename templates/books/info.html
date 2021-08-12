@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Book Info</h1>
+<div class="card">
+    <div class="row g-0">
+        <div class="col-md-2">
+            <img src="{{book.cover_img_url_m}}" class="img-fluid rounded-start m-3" alt="{{book.title}}">
+        </div>
+        <div class="col-md-10">
+            <div class="card-body">
+                <h3 class="card-title">{{book.title}}</h3>
+                <h4 class="card-subtitle mb-2 text-muted">By {{book.author}}</h4>
+                <p class="card-text">Published: {{book.published_year}}</p>
+                <p class="card-text">{{book.description}}</p>
+                <p class="card-text"><em>Subjects: {{book.subjects}}</em></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="m-5" align="center">
+    <h3>Statuses</h3>
+    <p>BookLandia can have one copy or several copies on the shelf.</p>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Book Id</th>
+                <th scope="col">Location</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Condition</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for s in statuses %}
+            <tr>
+                <th scope="row">{{s.book_id}}</th>
+                <td>{{s.location}}</td>
+                <td>{{s.user.username}}</td>
+                <td>{{s.condition}}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+<hr>
+<div class="m-5" align="center">
+    <h3 class="text-primary fw-bold">Book Rating</h3>
+    <p>Average: {{book.avg_rating}} out of 5 Stars</p>
+    <span class="text-primary">
+        {% if book.avg_rating == 0 or book.avg_rating == None -%}
+        <i class="far fa-star"></i>
+        <i class="far fa-star"></i>
+        <i class="far fa-star"></i>
+        <i class="far fa-star"></i>
+        <i class="far fa-star"></i>
+        {% elif book.avg_rating > 1 and book.avg_rating <= 1.5 -%} <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            {% elif book.avg_rating > 1.5 and book.avg_rating <= 2.5 -%} <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                {% elif book.avg_rating > 2.5 and book.avg_rating <= 3.5 -%} <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                    {% elif book.avg_rating > 3.5 and book.avg_rating <= 4.5 -%} <i class="fas fa-star">
+                        </i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        {% else -%}
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        {% endif %}
+    </span>
+
+    {% if not g.user.user_id in user_ids %}
+    <div>
+        <a class="btn btn-primary btn-md m-3" href="/book/{{book.book_id}}/{{g.user.user_id}}/review">
+            <i class="fas fa-star"></i>
+            Add Review</a>
+    </div>
+    {% endif %}
+</div>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Rating</th>
+                <th scope="col">Review</th>
+                <th scope="col">Reviewer</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for r in ratings %}
+            <tr>
+                <th scope="row">
+                    <span class="text-primary">
+                        {% if r.rating == 0 or r.rating == None -%}
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        {% elif r.rating > 1 and r.rating <= 1.5 -%} <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            {% elif r.rating > 1.5 and r.rating <= 2.5 -%} <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                {% elif r.rating > 2.5 and r.rating <= 3.5 -%} <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    {% elif r.rating > 3.5 and r.rating <= 4.5 -%} <i class="fas fa-star">
+                                        </i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        {% else -%}
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        {% endif %}
+
+                </th>
+                <td>{{r.review}}</td>
+                <td>{{r.user.username}}</td>
+                <td>
+                    {% if r.user.user_id == g.user.user_id %}
+                    <a class="btn btn-primary btn-md ml-2" style="display: inline;"
+                        href="/book/{{r.book_rated}}/{{g.user.user_id}}/review/update">
+                        <i class="fas fa-star"></i>
+                        Update Your Review</a>
+                    {% else -%}
+                    Not Applicable
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

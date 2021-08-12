@@ -54,18 +54,14 @@ def homepage():
                     .order_by(Status.timestamp.desc())
                     .limit(10))
 
-        books_ids = [book.book_id for book in latest_books]
-        book_ratings_avg = {}
-        for book in books_ids: 
-            average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating).label('average'))
-                        .filter(BookRating.book_rated==book).group_by(BookRating.book_rated).all())
-            if average_rating:
-                temp = str(average_rating)
-                temp2 = temp.split("'")
-                temp = float(temp2[1])
-                book_ratings_avg[f'{book}'] = '{:,}'.format(round(temp,1))
-        print("*****************",book_ratings_avg)
-        return render_template('home.html', status=latest_books, avgs=book_ratings_avg)
+ 
+        rated_books = (BookRating.query
+                    .filter_by(user_rating=g.user.user_id)
+                    .all())
+ 
+        reviews_book_ids = [review.book_rated for review in rated_books]
+
+        return render_template('home.html', status=latest_books, reviews=reviews_book_ids)
 
     else:
         return render_template('home-anon.html')
@@ -215,6 +211,21 @@ def search_booklandia():
 
     return render_template('books/results.html', status=found_books)
 
+@app.route('/book/<int:book_id>')
+def book_info(book_id):
+    """ See details about specific book, requests/owners, and reviews"""
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    book = Book.query.filter_by(book_id=book_id).one()
+    book_statuses = Status.query.filter_by(book_id=book_id).all()
+    book_reviews = BookRating.query.filter_by(book_rated=book_id).all()
+    reviews_user_ids = [review.user_rating for review in book_reviews]
+
+    return render_template('books/info.html', book=book, statuses=book_statuses, ratings=book_reviews, user_ids=reviews_user_ids)
+
 @app.route('/book/<int:book_id>/update', methods=["GET","POST"])
 def update_book(book_id):
     """ This will updated specific book for user"""
@@ -323,10 +334,51 @@ def review_book(book_id,user_id):
                     user_rating=user.user_id,rating=rating,review=review)
         db.session.add(new_rating)
         db.session.commit()
+
+       
+        average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating))
+                        .filter(BookRating.book_rated==book_id).group_by(BookRating.book_rated).all())
+
+        temp = str(average_rating)
+        temp2 = temp.split("'")
+        temp = float(temp2[1])
+        book_ratings_avg = '{:,}'.format(round(temp,1))
+        book_under_review.avg_rating = float(book_ratings_avg)
+        db.session.commit()
+
         flash("Rating and review added.", "success")
         return redirect("/")
 
     return render_template('books/review.html', form=form, book=book_under_review)
+
+
+@app.route('/book/<int:book_id>/<int:user_id>/review/update', methods=["GET","POST"])
+def update_book_review(book_id,user_id):
+    """User can update their rating and review for a particular book"""
+        
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    book_under_review = Book.query.get(book_id)
+
+    form=BookReviewForm()
+
+    if form.validate_on_submit():
+        rating = request.form['rating']
+        review = request.form['review']
+
+        current_review = BookRating.query.filter_by(book_rated=book_id,user_rating=user_id).one()
+        current_review.rating = rating
+        current_review.review = review
+
+        db.session.commit()
+
+        flash("Rating and review updated.", "success")
+        return redirect("/")
+    
+    return render_template('books/update_rv.html', form=form, book=book_under_review)
+
 #--------------------------------------------------------------------------#
 #                  User Routes
 #--------------------------------------------------------------------------#
@@ -351,8 +403,13 @@ def see_library():
             .filter(Status.book_id.in_(book_ids))
             .filter_by(user_id=g.user.user_id)
             .order_by(Status.timestamp.desc()))
-    #users_books = (Status.query.filter_by(user_id=g.user.user_id).order_by(Status.book_id.desc()))
-    return render_template('users/library.html',statuses=statuses)
+    
+    rated_books = (BookRating.query
+                    .filter_by(user_rating=g.user.user_id)
+                    .all())
+    reviews_book_ids = [review.book_rated for review in rated_books]
+
+    return render_template('users/library.html',statuses=statuses, reviews=reviews_book_ids)
 
 @app.route('/user/profile')
 def see_profile():
@@ -379,8 +436,12 @@ def see_requestor_profile(user_id):
     statuses = (Status.query
             .filter_by(user_id=requestor.user_id)
             .order_by(Status.timestamp.desc()))
+    
+    rated_books = (BookRating.query
+                    .filter_by(user_rating=user_id)
+                    .all())
 
-    return render_template('users/requestor.html',user=requestor,statuses=statuses)
+    return render_template('users/requestor.html',user=requestor,statuses=statuses,ratings=rated_books)
 
 
 @app.route('/user/profile/update', methods=["GET", "POST"])
