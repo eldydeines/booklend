@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, DataRequired, Email, Length
 
 class RegisterForm(FlaskForm):
+    """Form to register users"""
     username = StringField("Username", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=6)])
     first_name = StringField("First Name", validators=[InputRequired()])
@@ -20,19 +21,19 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    """Login form."""
+    """Form to login users"""
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
 
 class StatusForm(FlaskForm):
-    """Update Book Location and Condition"""
+    """Form for a user to update Book Location and Condition"""
 
     location = SelectField(u'Location of Book', choices=[('On Shelf'), ('Requested'), ('Checked Out'), ('Off Shelf')])
     condition = SelectField(u'Condition of Book', choices=[('Like New'), ('Worn'), ('Held by Tape')])
 
 class ProfileForm(FlaskForm):
-    """Update user's profile"""
+    """ Form to update a user's profile"""
     
     first_name = StringField("First Name")
     last_name = StringField("Last Name")   
@@ -49,7 +50,7 @@ class ProfileForm(FlaskForm):
     password = PasswordField('Please enter your password to save updates.', validators=[InputRequired()])
 
 class BookReviewForm(FlaskForm):
-    """Book review form"""
+    """Form to review books"""
     
     rating = SelectField(u'Rating', choices=[(5, '5 Stars: Drop Everything and Read Now!'), 
     (4, '4 Stars: Pretty Good, Would Recommend to Friends'), 
