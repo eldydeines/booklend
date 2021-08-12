@@ -1,23 +1,60 @@
 #--------------------------------------------------------------------------#
-#                   API Calls
+#  Capstone Project:  BookLandia
+#  Func.py is dedicated to API calls to Open Library
+#  We create a class and class functions to save each search
+#  A lot of time was spend on understanding this API even after 
+#  conducting the necessary research. Some of the data received was 
+#  inconsistent.  By providing different test cases, it helped to indentify  
+#  the flaws in the API data. 
+#
+#  References: 
+#  --- API Open Library Documentation Website
+#  --- Previous projects in GitHub Repository 
+#  --- SpringBoard Exercises & Lessons
+#  
+#  By: Eldy Deines  Date: 8/11/2021
 #--------------------------------------------------------------------------#
+
+
+#--------------------------------------------------------------------------#
+#                           Import Necessary Libraries 
+#--------------------------------------------------------------------------#
+
 
 import requests
 from models import db, connect_db, Book
+
+
+#--------------------------------------------------------------------------#
+#                           Establish baseline API URLs
+#--------------------------------------------------------------------------#
 
 SEARCH_URL = "https://openlibrary.org/search.json?"
 INFO_URL = "https://openlibrary.org"
 COVER_URL = "http://covers.openlibrary.org/b/olid/"
 
-class Warehouse:
 
+#--------------------------------------------------------------------------#
+#                           Warehouse Class - stores search findings
+#--------------------------------------------------------------------------#
+
+class Warehouse:
+    """ Warehouse 
+        - makes the API Calls
+        - cleans the data  
+        - adds to Booklandia database
+        - serializes data for JSON reply 
+    """
+    
     def __init__(self, title, author):
+        """Instatiate class variables on self """
         self.title = title
         self.author = author
         self.book_search_url = ""
         self.findings = {}
 
     def __repr__(self):
+        """Creates string identifier in command prompt"""
         return f"<Warehouse title={self.title}, author={self.author}"
     
     def add_to_db(self, num, keys):
