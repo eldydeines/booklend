@@ -7,7 +7,9 @@
 #  Status Form - collects book location and condition information from user
 #  Profile Form - collects profile updates from user
 #  BookReview Form - collects book's rating and review from user
+#
 #  References: 
+#  --- WTForms Documentation Site
 #  --- Previous projects in GitHub Repository 
 #  --- SpringBoard Exercises & Lessons
 #  
