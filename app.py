@@ -1,3 +1,22 @@
+#--------------------------------------------------------------------------#
+#  Capstone Project:  BookLandia
+#  BookLandia allows people to find and add books to their shelf.  
+#  Books have title, author, description, reviews, and more.
+#  Users can see available books and can request/approve book requests.
+#
+#  References: 
+#  --- Previous projects in GitHub Repository 
+#  --- SpringBoard Exercises & Lessons
+#  
+#  By: Eldy Deines  Date: 8/11/2021
+#--------------------------------------------------------------------------#
+
+
+#--------------------------------------------------------------------------#
+#                           Import Necessary Libraries 
+#--------------------------------------------------------------------------#
+
+
 import os
 from threading import ThreadError
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
@@ -9,16 +28,20 @@ from models import BookRating, db, connect_db, User, Book, Status, Borrower, Boo
 from forms import RegisterForm, LoginForm, StatusForm, ProfileForm, BookReviewForm
 from func import Warehouse
 
-#sets up session variable
+
+#--------------------------------------------------------------------------#
+#                           Setup App Configurations & Variables
+#--------------------------------------------------------------------------#
+
+
+# Sets up session variable
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
-#app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "CKsec123secKC"
-#app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'ed2407')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 #Connect and create database
@@ -27,12 +50,19 @@ connect_db(app)
 #Add app to debug tool
 toolbar = DebugToolbarExtension(app)
 
+
+#--------------------------------------------------------------------------#
 #--------------------------------------------------------------------------#
 #                           Start Routes 
 #--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
+
 @app.before_request
 def add_user_to_g():
-    """If we're logged in, add curr user to Flask global."""
+    """If we're logged in, add the saved sesssion user to current 
+    user to Flask global before app requests start. If not, there is 
+    global user is none.
+    """
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
@@ -40,43 +70,52 @@ def add_user_to_g():
     else:
         g.user = None
 
+
 @app.route('/')
 def homepage():
     """Show homepage:
-    - anonymous users: will be directed to signup
-    - logged in users: will see list of books on shelves
+    - Anonymous users: will be directed to signup
+    - logged in user: will see list of books on shelves and reviews
     """
+
     if g.user:
-        # I was having trouble using the list of Ids and had to reference the solution for this one. 
+        
+        #Get the latest books added to BookLandia by timestamp
         latest_books = (Status
                     .query
                     .filter_by(location="On Shelf")
                     .order_by(Status.timestamp.desc())
                     .limit(10))
 
- 
+        #Get ratings specific to user
         rated_books = (BookRating.query
                     .filter_by(user_rating=g.user.user_id)
                     .all())
- 
+        
+        #Filter out book ids from ratings and send back as list
         reviews_book_ids = [review.book_rated for review in rated_books]
 
+        #render this template for users that is logged in.
         return render_template('home.html', status=latest_books, reviews=reviews_book_ids)
 
     else:
+        #render this template for users that have not logged in.
         return render_template('home-anon.html')
 
+
+#--------------------------------------------------------------------------#
 #--------------------------------------------------------------------------#
 #                   Register, Login, and Logout Routes
 #--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
 
 def do_login(user):
-    """Log in user."""
+    """Log in user by adding user to session."""
     session[CURR_USER_KEY] = user.user_id
 
 
 def do_logout():
-    """Logout user."""
+    """Logout user by deleting the user from the session."""
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
         
@@ -84,6 +123,7 @@ def do_logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
     """Register User: Validate submissions, create a new user, add user to session """
+
     form = RegisterForm()
     if form.validate_on_submit():
         username = form.username.data
@@ -104,16 +144,20 @@ def register_user():
         new_user = User.register(username, password, email, first_name, last_name, 
                                  address1, address2, town, state, zip, phone, profile, fav_book, fav_author)
         db.session.add(new_user)
+        
         try:
             db.session.commit()
         except IntegrityError:
-            form.username.errors.append('Sorry, but this username is taken.  Please pick another')
+            form.username.errors.append('Sorry, but this username is taken.  Please pick another.')
             return render_template('register.html', form=form)
+        
         do_login(new_user)
+
         flash('Welcome! Your Account has been created!', "success")
         return redirect('/addbooks')
 
     return render_template('register.html', form=form)
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -122,6 +166,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+        #authenticates user against saved credentials
         user = User.authenticate(form.username.data,
                                  form.password.data)
 
@@ -134,6 +179,7 @@ def login():
 
     return render_template('login.html', form=form)
 
+
 @app.route('/logout')
 def logout():
     """Logout user by removing their username from the session"""
@@ -141,18 +187,28 @@ def logout():
     flash("You have been logged out.", 'danger')
     return redirect('/login')
 
+
 #--------------------------------------------------------------------------#
-#                   API Routes
 #--------------------------------------------------------------------------#
+#                   API Routes from JavaScript to OpenLibrary
+#--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
+
 
 @app.route("/addbooks")
 def add_books():
     """Render search form"""
+
     return render_template('books/search_wh.html')
 
 @app.route('/api/search-wh')
 def search_wh():
-    """ This will get books based on Title and Author"""
+    """ Upon receipt of AJAX request, we save arguments and search the API Warehouse Class.  
+    If we find books, those are saved into our Book Table to save the search findings.
+    We will also serialize information for JSON response
+    If results are empty, we provide the user with JSON message.
+    """
+
     title = request.args['title']
     author = request.args['author']
     
@@ -169,27 +225,41 @@ def search_wh():
     
 
 #--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
 #                  Book Routes
 #--------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
+
+
 @app.route('/book/add-book')
 def add_book():
-    """ This will add the book to user's library"""
+    """ Upon seeing API search results on FrontEnd, users can add any books to 
+    their shelf which are directly tied from User to Status to Book tables. 
+    This allows the append option to work. Note, we use the book key when 
+    working with the API results to ensure a unique book.
+    """
+    
     key = request.args['key']
 
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
-    book_to_add = Book.query.filter_by(key=key).first()
-        
+    book_to_add = Book.query.filter_by(key=key).first() 
     book_to_add.user.append(g.user)
     db.session.commit()      
 
     return (jsonify("Book Added"),201)
 
+
 @app.route('/search')
 def search_booklandia():
-    """ This will add the book to user's library"""
+    """A user can search the Books Database which will look at the title, author, and description. 
+       There is a field in the nav bar that will collect arguments and send to this path.  
+       We have to format and the arguments with SQL like arguments i.e. %.
+       Upon finding in Book Table, we then filter out books that can be borrowed.
+       We serve up those findings on a results page. 
+    """
  
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -211,9 +281,12 @@ def search_booklandia():
 
     return render_template('books/results.html', status=found_books)
 
+
 @app.route('/book/<int:book_id>')
 def book_info(book_id):
-    """ See details about specific book, requests/owners, and reviews"""
+    """ Every book has it's own page. You can see details about specific book, requests/owners, and reviews.
+    To show necessary information, we query against the book table, the status table, and the book rating table.
+    """
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -226,9 +299,12 @@ def book_info(book_id):
 
     return render_template('books/info.html', book=book, statuses=book_statuses, ratings=book_reviews, user_ids=reviews_user_ids)
 
+
 @app.route('/book/<int:book_id>/update', methods=["GET","POST"])
 def update_book(book_id):
-    """ This will updated specific book for user"""
+    """ If a user owns a book, they have the ability to update the book's location and condition. Users will 
+    not be able to update books that are own by other users. They are presented with a WTForm for these two arguments.
+    These values are then committed to the database for the specific book being updated."""
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -249,9 +325,12 @@ def update_book(book_id):
         return redirect(f"/user/library")
     return render_template('books/update_bk.html', form=form, book=user_book)
 
+
 @app.route('/book/<int:book_id>/delete', methods=["POST"])
 def delete_book(book_id):
-    """ Delete a specific book from user's library"""
+    """ While updating a book that they own, they can delete this from their libarary by committing 
+    the delete to the status table. This will not delete the book from the book table.  
+    """
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -263,9 +342,14 @@ def delete_book(book_id):
     flash("Book removed from library.", "success")
     return redirect(f"/user/library")
 
+
 @app.route('/book/<int:book_id>/<int:user_id>/request', methods=["POST"])
 def request_book(book_id,user_id):
-    """Update database to show this new request for specified book and book owner"""
+    """If a user finds a book where location of book is "On the Shelf", they can request this book.
+    Upon hitting the request button, this route is taken. The request is saved in the Borrower Table and 
+    will remain there until the owner of the book approves/disapproves the request. 
+    The user is redirected to see all requests that they have made and that are requesting his/her book. 
+    """
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -286,7 +370,9 @@ def request_book(book_id,user_id):
     
 @app.route('/book/<int:book_id>/<int:user_id>/approve', methods=["POST"])
 def approve_request(book_id,user_id):
-    """Book Owner can approve the request and will update status of book"""
+    """Book Owner can approve the request that has been made on their book.
+       This will update the status of book to "Checked Out".
+    """
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -299,7 +385,10 @@ def approve_request(book_id,user_id):
 
 @app.route('/book/<int:book_id>/<int:user_id>/reject', methods=["POST"])
 def reject_request(book_id,user_id):
-    """Book Owner can reject the request and remove from Borrower table"""
+    """Book Owner can reject the request that has been made on their book.
+       This will remove the request from the Borrower table and put the book back on the shelf.
+    """
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -316,7 +405,13 @@ def reject_request(book_id,user_id):
 
 @app.route('/book/<int:book_id>/<int:user_id>/review', methods=["GET","POST"])
 def review_book(book_id,user_id):
-    """Logged in user can write a review and provide a rating on any book"""
+    """Logged in user can write a review and provide a rating on any book. We first query to get the 
+    specific book object. Upon validating WTForm, we create a new rating record in the BookRating table.
+    With the added rating, we need to update the Avg Rating for the book in question. We perform a 
+    SQL func avg call that groups all ratings for that one book and save to variable. Because the average
+    comes back as a dictionary and decimal, we need to do some formatting and type conversion before
+    committing to the Book Column "avg_rating".
+    """
     
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -354,7 +449,9 @@ def review_book(book_id,user_id):
 
 @app.route('/book/<int:book_id>/<int:user_id>/review/update', methods=["GET","POST"])
 def update_book_review(book_id,user_id):
-    """User can update their rating and review for a particular book"""
+    """If a user has an existing review on specific book, they can update the rating and review in this route.
+    Because they may have changed their rating value, we need to ensure the avg_rating is updated.
+    """
         
     if not g.user:
         flash("Access unauthorized.", "danger")
