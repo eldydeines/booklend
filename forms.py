@@ -7,6 +7,7 @@
 #  Status Form - collects book location and condition information from user
 #  Profile Form - collects profile updates from user
 #  BookReview Form - collects book's rating and review from user
+#  LenderReview Form - collects lender rating and review from user
 #
 #  References: 
 #  --- WTForms Documentation Site
@@ -88,4 +89,11 @@ class BookReviewForm(FlaskForm):
     (3, '3 Stars: Eh, In between'), 
     (2,'2 Stars: Struggled to finish'),
     (1, '1 Star: Do Not Bother')])
+    review = TextAreaField(u'Book Review',validators=[InputRequired()])
+
+
+class LenderReviewForm(FlaskForm):
+    """Form to review books"""
+    
+    rating = SelectField(u'Rating', choices=[(5, '5 Hearts'), (4, '4 Hearts'), (3, '3 Hearts'), (2,'2 Hearts'), (1, '1 Hearts')])
     review = TextAreaField(u'Book Review',validators=[InputRequired()])

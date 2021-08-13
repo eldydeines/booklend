@@ -27,7 +27,7 @@
                 <td>{{s.location}}</td>
                 <td>{{s.condition}}</td>
                 <td>
-                    <a class="btn btn-info btn-md" href="/book/{{s.book_id}}/update">Update Book Status</a>
+                    <a class="btn btn-info btn-md" href="/book/{{s.book_id}}/update">Update Book</a>
                     {% if s.book.book_id in reviews %}
                     <a class="btn btn-primary btn-md ml-2" style="display: inline;"
                         href="/book/{{s.book_id}}/{{g.user.user_id}}/review/update">

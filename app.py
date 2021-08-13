@@ -3,6 +3,7 @@
 #  BookLandia allows people to find and add books to their shelf.  
 #  Books have title, author, description, reviews, and more.
 #  Users can see available books and can request/approve book requests.
+#  Users can also provide ratings on lenders.
 #
 #  References: 
 #  --- Previous projects in GitHub Repository 
@@ -24,8 +25,8 @@ from flask.typing import TeardownCallable
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
-from models import BookRating, db, connect_db, User, Book, Status, Borrower, BookRating
-from forms import RegisterForm, LoginForm, StatusForm, ProfileForm, BookReviewForm
+from models import BookRating, db, connect_db, User, Book, Status, Borrower, BookRating, LenderRating
+from forms import RegisterForm, LoginForm, StatusForm, ProfileForm, BookReviewForm, LenderReviewForm
 from func import Warehouse
 
 
@@ -493,7 +494,11 @@ def see_all_users():
         return redirect("/")
 
     users = User.query.all()
-    return render_template('users/all.html',users=users)
+    lender_ratings = LenderRating.query.filter_by(user_rating_id=g.user.user_id)
+    ratings = [borrow_ee.user_id for borrow_ee in g.user.borrow_ee]
+
+ 
+    return render_template('users/all.html',users=users,ratings=ratings)
 
 
 @app.route('/user/library')
@@ -642,6 +647,53 @@ def show_requests():
                     .filter( (Status.user_id==g.user.user_id) | ((Status.book_id.in_(user_books)) & (Status.user_id.in_(user_users))) )
                     .all())
     user_borrows = (Borrower.query
-                    .filter((Borrower.borrower_id==g.user.user_id) |(Borrower.status_owner_id==g.user.user_id))
+                    .filter((Borrower.borrower_id==g.user.user_id) | (Borrower.status_owner_id==g.user.user_id))
                     .all())
     return render_template('users/requests.html', statuses=all_requests, requestor=user_borrows)
+
+@app.route('/user/<int:user_id>/review', methods=["GET","POST"])
+def review_lender(user_id):
+    """Logged in user can write a review and provide a rating someone who has lended a book to them. 
+    We first query Borrower to make sure their is at least one instance of a borrow. 
+    Upon validating WTForm, we create a new rating record in the BookRating table.
+    With the added rating, we need to update the Avg Rating for the book in question. We perform a 
+    SQL func avg call that groups all ratings for that one book and save to variable. Because the average
+    comes back as a dictionary and decimal, we need to do some formatting and type conversion before
+    committing to the Book Column "avg_rating".
+    """
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    lender_under_review = User.query.get(user_id)
+    form=LenderReviewForm()
+    has_borrowed = (Borrower.query
+                    .filter((Borrower.status_owner_id==user_id),(Borrower.borrower_id==g.user.user_id))
+                    .first())
+    if has_borrowed:
+        
+        if form.validate_on_submit():
+            rating = request.form['rating']
+            review = request.form['review']
+            new_rating = LenderRating(user_being_rated_id=lender_under_review.user_id, user_rating_id=g.user.user_id,rating=rating,review=review)
+            db.session.add(new_rating)
+            db.session.commit()
+            average_rating = (LenderRating.query.with_entities(func.avg(LenderRating.rating))
+                        .filter(LenderRating.user_being_rated_id==lender_under_review.user_id)
+                        .group_by(LenderRating.user_being_rated_id).all())
+
+            temp = str(average_rating)
+            temp2 = temp.split("'")
+            temp = float(temp2[1])
+            user_ratings_avg = '{:,}'.format(round(temp,1))
+            lender_under_review.avg_rating = float(user_ratings_avg)
+            db.session.commit()
+
+            flash("Rating and review added.", "success")
+            return redirect(f"/users/all")
+    else:
+        flash("Rating not added as you need to have borrowed previously from user.", "danger")
+        return redirect("/users/all")
+
+    return render_template('users/review.html', form=form, lender=lender_under_review)
+

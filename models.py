@@ -8,6 +8,7 @@
 #  Borrower Model - shows who has requested/borrowed the owner's book
 #  BookRating Model - saves all ratings and reviews for many
 #               users to many books
+#  LenderRating Model - saves all ratings by lender and borrower
 #
 #  References: 
 #  --- SQLAlchemy Documentation Website
@@ -39,6 +40,15 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
+class LenderRating(db.Model):
+    """ Connection between lender and borrower """
+
+    __tablename__ = 'lender_ratings'
+
+    user_being_rated_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"), primary_key=True)
+    user_rating_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"), primary_key=True)
+    rating = db.Column(db.Integer)
+    review = db.Column(db.Text)
 
 class User(db.Model):
     """Table for user profiles. One to Many"""
@@ -60,9 +70,24 @@ class User(db.Model):
     profile = db.Column(db.Text)
     fav_book = db.Column(db.Text)
     fav_author = db.Column(db.Text)
+    avg_rating = db.Column(db.Float)
 
     status = db.relationship('Status')
     borrower = db.relationship('Borrower')
+
+    lender = db.relationship(
+        "User",
+        secondary="lender_ratings",
+        primaryjoin=(LenderRating.user_being_rated_id == user_id),
+        secondaryjoin=(LenderRating.user_rating_id == user_id)
+    )
+
+    borrow_ee = db.relationship(
+        "User",
+        secondary="lender_ratings",
+        primaryjoin=(LenderRating.user_rating_id == user_id),
+        secondaryjoin=(LenderRating.user_being_rated_id == user_id)
+    )
 
     def __repr__(self):
         """show info about user in cmd prompt"""
@@ -149,7 +174,7 @@ class Status(db.Model):
 
 
 class Borrower(db.Model):
-    """ Joins together a book with a borrower. Many to many """
+    """ Joins together a book with a borrower for ratings and reviews Many to many """
 
     __tablename__ = "borrowers"
 
@@ -157,7 +182,7 @@ class Borrower(db.Model):
     book_id = db.Column(db.Integer)
     status_owner_id = db.Column(db.Integer)
     borrower_id = db.Column(db.Integer, db.ForeignKey("users.user_id",ondelete="cascade"))
-    
+
     user = db.relationship('User')
 
     def __repr__(self):
@@ -183,3 +208,6 @@ class BookRating(db.Model):
         """show info about tag in cmd prompt"""
         b = self
         return f"<BOOKRATING book={b.book_rated} user={b.user_rating}>"
+
+
+
