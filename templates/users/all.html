@@ -71,15 +71,17 @@
                             <i class="fas fa-user-circle"></i>
                             {{u.username}} Book Shelf</a>
 
-                        |
-                        {% if u.user_id in ratings and u.user_id != g.user_id %}
-                        update review
-                        {% elif u.user_id != g.user_id %}
-                        <a href="/user/{{u.user_id}}/review">
 
+                        {% if u.user_id in ratings and u.user_id != g.user.user_id %}
+                        &nbsp|&nbsp
+                        <a href="/user/{{u.user_id}}/review/update">
+                            <i class="fas fa-heart"></i>
+                            Update Review</a>
+                        {% elif u.user_id != g.user.user_id %}
+                        &nbsp|&nbsp
+                        <a href="/user/{{u.user_id}}/review">
                             <i class="fas fa-heart"></i>
                             Add Lender Review</a>
-
                         {% endif %}
                 </td>
             </tr>

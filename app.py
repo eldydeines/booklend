@@ -470,6 +470,15 @@ def update_book_review(book_id,user_id):
         current_review.rating = rating
         current_review.review = review
 
+        average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating))
+                        .filter(BookRating.book_rated==book_id).group_by(BookRating.book_rated).all())
+
+        temp = str(average_rating)
+        temp2 = temp.split("'")
+        temp = float(temp2[1])
+        book_ratings_avg = '{:,}'.format(round(temp,1))
+        book_under_review.avg_rating = float(book_ratings_avg)
+
         db.session.commit()
 
         flash("Rating and review updated.", "success")
@@ -485,7 +494,7 @@ def update_book_review(book_id,user_id):
 #--------------------------------------------------------------------------#
 
 
-@app.route('/users/all')
+@app.route('/user/all')
 def see_all_users():
     """Render a list of all users only if you are a logged in user"""
     
@@ -495,7 +504,7 @@ def see_all_users():
 
     users = User.query.all()
     lender_ratings = LenderRating.query.filter_by(user_rating_id=g.user.user_id)
-    ratings = [borrow_ee.user_id for borrow_ee in g.user.borrow_ee]
+    ratings = [lender.user_being_rated_id for lender in lender_ratings]
 
  
     return render_template('users/all.html',users=users,ratings=ratings)
@@ -655,11 +664,11 @@ def show_requests():
 def review_lender(user_id):
     """Logged in user can write a review and provide a rating someone who has lended a book to them. 
     We first query Borrower to make sure their is at least one instance of a borrow. 
-    Upon validating WTForm, we create a new rating record in the BookRating table.
-    With the added rating, we need to update the Avg Rating for the book in question. We perform a 
-    SQL func avg call that groups all ratings for that one book and save to variable. Because the average
+    Upon validating WTForm, we create a new rating record in the LenderRating table.
+    With the added rating, we need to update the Avg Rating for the user in question. We perform a 
+    SQL func avg call that groups all ratings for that one userk and save to variable. Because the average
     comes back as a dictionary and decimal, we need to do some formatting and type conversion before
-    committing to the Book Column "avg_rating".
+    committing to the "avg_rating" to the User.
     """
     
     if not g.user:
@@ -697,3 +706,42 @@ def review_lender(user_id):
 
     return render_template('users/review.html', form=form, lender=lender_under_review)
 
+
+@app.route('/user/<int:user_id>/review/update', methods=["GET","POST"])
+def update_user_review(user_id):
+    """If a user has an existing review on a user, they can update the rating and review in this route.
+    Because they may have changed their rating value, we need to ensure the avg_rating is updated 
+    for the specified user.
+    """
+        
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    user_under_review = User.query.get(user_id)
+
+    form=LenderReviewForm()
+
+    if form.validate_on_submit():
+        rating = request.form['rating']
+        review = request.form['review']
+
+        current_review = LenderRating.query.filter_by(user_being_rated_id=user_id,user_rating_id=g.user.user_id).one()
+        current_review.rating = rating
+        current_review.review = review
+
+        average_rating = (LenderRating.query.with_entities(func.avg(LenderRating.rating))
+                        .filter(LenderRating.user_being_rated_id==user_under_review.user_id)
+                        .group_by(LenderRating.user_being_rated_id).all())
+
+        temp = str(average_rating)
+        temp2 = temp.split("'")
+        temp = float(temp2[1])
+        user_ratings_avg = '{:,}'.format(round(temp,1))
+        user_under_review.avg_rating = float(user_ratings_avg)
+        db.session.commit()
+
+        flash("Rating and review updated.", "success")
+        return redirect("/user/all")
+    
+    return render_template('users/update_rv.html', form=form, user=user_under_review)

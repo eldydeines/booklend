@@ -4,43 +4,34 @@
 <div class="col-12">
     <h1 class="text-center" align="center">BookLandia</h1>
 
-    <p align="center">Update Lender Review</p>
+    <p align="center">Update Lender Review for {{user.username}}</p>
 
-    <div class="row g-0">
 
-        <div class="col-md-3">
 
-            Previous Review
-            <h5>{{book.title}}</h5>
-            <h6 class="text-muted">By {{book.author}}</h6>
-            <p>Published: {{book.published_year}}</p>
+    <div class="form-group border-start">
 
-        </div>
+        <form method="POST">
 
-        <div class="form-group col-9 border-start">
+            {{ form.hidden_tag() }}
 
-            <form method="POST">
+            {% for field in form
+            if field.widget.input_type != 'hidden' %}
+            <p>
+                {{ field.label }}
+                {{ field(class_="form-control") }}
 
-                {{ form.hidden_tag() }}
-
-                {% for field in form
-                if field.widget.input_type != 'hidden' %}
-                <p>
-                    {{ field.label }}
-                    {{ field(class_="form-control") }}
-
-                    {% for error in field.errors %}
-                    <span class="form-text text-danger">{{ error }}</span>
-                    {% endfor %}
-                </p>
+                {% for error in field.errors %}
+                <span class="form-text text-danger">{{ error }}</span>
                 {% endfor %}
+            </p>
+            {% endfor %}
 
-                <button class="btn btn-success p-1">Post Review</button>
+            <button class="btn btn-success p-1">Post Review</button>
 
-            </form>
-            <a class="btn btn-primary text-light mt-3" href="/">Cancel</a>
-        </div>
+        </form>
+        <a class="btn btn-primary text-light mt-3" href="/">Cancel</a>
     </div>
+
 </div>
 
 {% endblock %}
