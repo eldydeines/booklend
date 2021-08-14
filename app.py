@@ -41,7 +41,7 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ECHO"] = True
+app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = "CKsec123secKC"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
@@ -699,10 +699,10 @@ def review_lender(user_id):
             db.session.commit()
 
             flash("Rating and review added.", "success")
-            return redirect(f"/users/all")
+            return redirect(f"/user/all")
     else:
         flash("Rating not added as you need to have borrowed previously from user.", "danger")
-        return redirect("/users/all")
+        return redirect("/user/all")
 
     return render_template('users/review.html', form=form, lender=lender_under_review)
 
