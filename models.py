@@ -142,7 +142,6 @@ class Book(db.Model):
     avg_rating = db.Column(db.Float)
 
     user = db.relationship('User', secondary='statuses', backref='books')
-    
     status = db.relationship('Status')
 
     def __repr__(self):
