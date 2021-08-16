@@ -45,10 +45,10 @@
                 <td>
                     {% if s.user_id == g.user.user_id and s.location != "Checked Out" %}
                     <form method="POST" action="/book/{{s.book_id}}/{{s.user_id}}/approve">
-                        <button class="badge bg-success bg-secondary m-1" type="submit">Approve</button>
+                        <button class="btn btn-success btn-md m-1" type="submit">Approve</button>
                     </form>
                     <form method="POST" action="/book/{{s.book_id}}/{{s.user_id}}/reject">
-                        <button class="badge bg-danger bg-secondary m-1" type="submit">Reject</button>
+                        <button class="btn btn-danger btn-md m-1" type="submit">Reject</button>
                     </form>
                     {% elif s.location != "Checked Out" %}
                     Pending Approval
