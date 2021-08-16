@@ -1,17 +1,31 @@
+/* 
+Capstone Project:  BookLandia
+
+Jquery gets values of form when user is searching for a book
+We first make the API call with AJAX axios request
+If no findings, we expect messages within the response
+If we have findings, we need to handle that response with adding an element to DOM for each book received
+
+References: 
+    - https://api.jquery.com/ 
+    - Springboard projects
+*/
+
 const $spinner = $("#waiting").hide();
 /** processForm: get data from form and make AJAX call to our API. */
 async function processForm(evt) {
 
     evt.preventDefault();
     /** Show loader while wairing for response */
+
     $spinner.show();
     /** Get form entries */
     const title = $("#title").val();
     const author = $("#author").val();
 
     /** Make axios request and send entries - Wait for the response*/
-    let response = await axios.get("/api/search-wh",
-        { params: { title: title, author: author } });
+
+    let response = await axios.get("/api/search-wh", { params: { title: title, author: author } });
 
     $spinner.hide();
     /** Make call to handle the response received */
@@ -19,8 +33,9 @@ async function processForm(evt) {
         const $showsFoundBooks = $("#shows-found-books");
         $showsFoundBooks.empty().html(`<h3 class="row" align="center">${response.data}</h3>`);
     }
-    else
+    else {
         handleResponse(response);
+    }
 
 }
 

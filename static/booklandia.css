@@ -1,3 +1,15 @@
+/* 
+Capstone Project:  BookLandia
+Using spinner while waiting on 3rd Party Response
+    - Get specific class div
+    - Add styling to after load 
+    - Add keyframe for the animation
+References: 
+    - https://www.youtube.com/watch?v=trsuokl2Fp4
+    - https://stackoverflow.com/questions/68485/how-to-show-loading-spinner-in-jquery 
+    
+*/
+
 .loading {
     display: flex;
     justify-content: center;

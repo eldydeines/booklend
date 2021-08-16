@@ -147,8 +147,8 @@ class Book(db.Model):
     author = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     subjects = db.Column(db.Text)
-    cover_img_url_m = db.Column(db.Text)
-    cover_img_url_s = db.Column(db.Text)
+    cover_img_url_m = db.Column(db.Text, default="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png")
+    cover_img_url_s = db.Column(db.Text, default="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png")
     published_year = db.Column(db.Text)
     avg_rating = db.Column(db.Float)
 
