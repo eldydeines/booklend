@@ -36,8 +36,8 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ECHO"] = False
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "CKsec123secKC")
+app.config["SQLALCHEMY_ECHO"] = True
+app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY', 'CKsec123secKC')
 
 
 #Connect and create database
@@ -709,7 +709,7 @@ def update_user_review(user_id):
         current_review.review = review
 
         average_rating = (LenderRating.query.with_entities(func.avg(LenderRating.rating))
-                        .filter(LenderRating.user_being_rated_id==user_under_review.user_id)
+                        .filter(LenderRating.user_being_rated_id==lender_under_review.user_id)
                         .group_by(LenderRating.user_being_rated_id).all())
 
         lender_under_review.avg_rating = lender_under_review.calc_avg_rating(average_rating)
@@ -718,4 +718,4 @@ def update_user_review(user_id):
         flash("Rating and review updated.", "success")
         return redirect("/user/all")
     
-    return render_template('users/update_rv.html', form=form, user=user_under_review)
+    return render_template('users/update_rv.html', form=form, user=lender_under_review)
