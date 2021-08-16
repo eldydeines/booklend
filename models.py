@@ -94,6 +94,17 @@ class User(db.Model):
         u = self
         return f"<USER user_id={u.user_id} username={u.username}>"
 
+    def calc_avg_rating(cls, avg):
+        """cleans up the average received and sends back cleaner version"""
+
+        temp = str(avg)
+        temp2 = temp.split("'")
+        temp = float(temp2[1])
+        user_ratings_avg = '{:,}'.format(round(temp,1))
+        average_rating = float(user_ratings_avg)
+        
+        return average_rating
+
     @classmethod
     def register(cls, username, password, email, first_name, last_name, 
                 address1, address2, town, state, zip, phone, profile, fav_book, fav_author):

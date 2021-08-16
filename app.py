@@ -679,12 +679,7 @@ def review_lender(user_id):
             average_rating = (LenderRating.query.with_entities(func.avg(LenderRating.rating))
                         .filter(LenderRating.user_being_rated_id==lender_under_review.user_id)
                         .group_by(LenderRating.user_being_rated_id).all())
-
-            temp = str(average_rating)
-            temp2 = temp.split("'")
-            temp = float(temp2[1])
-            user_ratings_avg = '{:,}'.format(round(temp,1))
-            lender_under_review.avg_rating = float(user_ratings_avg)
+            lender_under_review.avg_rating = lender_under_review.calc_avg_rating(average_rating)
             db.session.commit()
 
             flash("Rating and review added.", "success")
@@ -707,7 +702,7 @@ def update_user_review(user_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
-    user_under_review = User.query.get(user_id)
+    lender_under_review = User.query.get(user_id)
 
     form=LenderReviewForm()
 
@@ -723,11 +718,7 @@ def update_user_review(user_id):
                         .filter(LenderRating.user_being_rated_id==user_under_review.user_id)
                         .group_by(LenderRating.user_being_rated_id).all())
 
-        temp = str(average_rating)
-        temp2 = temp.split("'")
-        temp = float(temp2[1])
-        user_ratings_avg = '{:,}'.format(round(temp,1))
-        user_under_review.avg_rating = float(user_ratings_avg)
+        lender_under_review.avg_rating = lender_under_review.calc_avg_rating(average_rating)
         db.session.commit()
 
         flash("Rating and review updated.", "success")
