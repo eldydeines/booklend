@@ -16,7 +16,7 @@
 #--------------------------------------------------------------------------#
 #                           Import Necessary Libraries 
 #--------------------------------------------------------------------------#
-
+import os
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
@@ -37,14 +37,13 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
-app.config["SECRET_KEY"] = "CKsec123secKC"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "CKsec123secKC")
 
 
 #Connect and create database
 connect_db(app)
 
 #Add app to debug tool
-toolbar = DebugToolbarExtension(app)
 
 
 #--------------------------------------------------------------------------#

@@ -24,7 +24,6 @@ async function processForm(evt) {
     const author = $("#author").val();
 
     /** Make axios request and send entries - Wait for the response*/
-
     let response = await axios.get("/api/search-wh", { params: { title: title, author: author } });
 
     $spinner.hide();
