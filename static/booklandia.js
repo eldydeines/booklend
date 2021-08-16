@@ -1,8 +1,10 @@
+const $spinner = $("#waiting").hide();
 /** processForm: get data from form and make AJAX call to our API. */
 async function processForm(evt) {
 
     evt.preventDefault();
-
+    /** Show loader while wairing for response */
+    $spinner.show();
     /** Get form entries */
     const title = $("#title").val();
     const author = $("#author").val();
@@ -11,6 +13,7 @@ async function processForm(evt) {
     let response = await axios.get("/api/search-wh",
         { params: { title: title, author: author } });
 
+    $spinner.hide();
     /** Make call to handle the response received */
     if (response.status != 201) {
         const $showsFoundBooks = $("#shows-found-books");
@@ -18,6 +21,7 @@ async function processForm(evt) {
     }
     else
         handleResponse(response);
+
 }
 
 /** handleResponse: deal with response from our lucky-num API. */
@@ -102,7 +106,6 @@ function handleResponse(resp) {
         $showsFoundBooks.append($item);
 
     }//end of for loop
-
 
 }
 
