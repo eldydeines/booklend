@@ -17,9 +17,6 @@
 #                           Import Necessary Libraries 
 #--------------------------------------------------------------------------#
 
-
-import os
-from threading import ThreadError
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
 from flask.typing import TeardownCallable
 from flask_debugtoolbar import DebugToolbarExtension
@@ -270,7 +267,7 @@ def search_booklandia():
     search_term = "%{}%".format(term) 
    
     findings = (Book.query
-            .filter((Book.title.like(search_term)) | (Book.author.like(search_term)) | (Book.description.like(search_term)))
+            .filter((Book.title.ilike(search_term)) | (Book.author.ilike(search_term)) | (Book.description.ilike(search_term)))
             .order_by(Book.title.desc())
             .all())
 
@@ -323,7 +320,7 @@ def update_book(book_id):
         db.session.add(user_book)
         db.session.commit()
         flash("Book updated.", "success")
-        return redirect(f"/user/library")
+        return redirect("/user/library")
     return render_template('books/update_bk.html', form=form, book=user_book)
 
 
@@ -341,7 +338,7 @@ def delete_book(book_id):
     db.session.delete(user_book)
     db.session.commit()
     flash("Book removed from library.", "success")
-    return redirect(f"/user/library")
+    return redirect("/user/library")
 
 
 @app.route('/book/<int:book_id>/<int:user_id>/request', methods=["POST"])
@@ -619,7 +616,7 @@ def update_profile():
 
             db.session.commit()
             flash("Profile has been updated.","success")
-            return redirect(f"/user/profile")
+            return redirect("/user/profile")
 
         flash("Password incorrect. Profile updates not saved.","warning")
 
@@ -683,7 +680,7 @@ def review_lender(user_id):
             db.session.commit()
 
             flash("Rating and review added.", "success")
-            return redirect(f"/user/all")
+            return redirect("/user/all")
     else:
         flash("Rating not added as you need to have borrowed previously from user.", "danger")
         return redirect("/user/all")
