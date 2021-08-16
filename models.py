@@ -148,6 +148,17 @@ class Book(db.Model):
         """show info about book in cmd prompt"""
         b = self
         return f"<BOOK book_id={b.book_id} key={b.key}> title={b.title}> author={b.author}>"
+    
+    def calc_avg_rating(cls, avg):
+        """cleans up the average received and sends back cleaner version"""
+
+        temp = str(avg)
+        temp2 = temp.split("'")
+        temp = float(temp2[1])
+        book_ratings_avg = '{:,}'.format(round(temp,1))
+        average_rating = float(book_ratings_avg)
+        
+        return average_rating
 
 
 class Status(db.Model):

@@ -434,12 +434,7 @@ def review_book(book_id,user_id):
        
         average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating))
                         .filter(BookRating.book_rated==book_id).group_by(BookRating.book_rated).all())
-
-        temp = str(average_rating)
-        temp2 = temp.split("'")
-        temp = float(temp2[1])
-        book_ratings_avg = '{:,}'.format(round(temp,1))
-        book_under_review.avg_rating = float(book_ratings_avg)
+        book_under_review.avg_rating = book_under_review.calc_avg_rating(average_rating)
         db.session.commit()
 
         flash("Rating and review added.", "success")
@@ -472,13 +467,7 @@ def update_book_review(book_id,user_id):
 
         average_rating = (BookRating.query.with_entities(func.avg(BookRating.rating))
                         .filter(BookRating.book_rated==book_id).group_by(BookRating.book_rated).all())
-
-        temp = str(average_rating)
-        temp2 = temp.split("'")
-        temp = float(temp2[1])
-        book_ratings_avg = '{:,}'.format(round(temp,1))
-        book_under_review.avg_rating = float(book_ratings_avg)
-
+        book_under_review.avg_rating = book_under_review.calc_avg_rating(average_rating)
         db.session.commit()
 
         flash("Rating and review updated.", "success")
