@@ -18,8 +18,6 @@
 #--------------------------------------------------------------------------#
 
 from flask import Flask, render_template, request, redirect, session, flash, g, jsonify
-from flask.typing import TeardownCallable
-from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 from models import BookRating, db, connect_db, User, Book, Status, Borrower, BookRating, LenderRating
@@ -40,7 +38,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///booklend"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = "CKsec123secKC"
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
 
 #Connect and create database
 connect_db(app)
