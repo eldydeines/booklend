@@ -2,25 +2,32 @@
 
 {% block content %}
 <div class="col-12">
-    <h1 class="text-center" align="center">Getting Started!</h1>
+    <h1 class="text-center" align="center">BookLandia</h1>
+    <hr>
+    <h3 class="text-center" align="center">Getting Started!</h3>
 
     <h4 align="center">Booklandia is all about sharing your library.</h4>
     <h4 align="center">Search for a book and add to your library!</h4>
 
-    <div class="row">
-        <div class="col-3"></div>
-        <div class="form-group col-6" align="center">
 
-            <form id="find-book-form">
-                <div class="m-2">Title of Book: <input id="title"></div>
-                <div class="m-2">Author of Book: <input id="author"></div>
-                <button class="btn btn-success m-2">Find my book</button>
-            </form>
+    <form id="find-book-form">
+
+        <div class="form-group">
+            <label for="title">Title of Book: </label>
+            <input type="text" class="form-control" id="title">
         </div>
-        <div class="col-3"></div>
-    </div>
+        <div class="form-group">
+            <label for="author">Author of Book: </label>
+            <input type="text" class="form-control" id="author">
+        </div>
+        <button class="btn btn-success m-2">Find my book</button>
+
+    </form>
+
 
     <div class="row mt-3" id="shows-found-books">
     </div>
+    <hr>
+    <hr>
 </div>
 {% endblock %}
